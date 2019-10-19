@@ -1,0 +1,255 @@
+#!/usr/bin/perl -w
+
+#Copyright (c) 2019 Alibaba Group Holding Limited
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+use Getopt::Long;
+    $Getopt::Long::ignorecase = 0;
+use File::Copy;
+use Cwd;
+use FileHandle;
+use File::Basename;
+use Term::ANSIColor;
+use strict;
+no strict 'refs';
+my $wujian100_open_PATH = `pwd`;
+chomp($wujian100_open_PATH);
+$wujian100_open_PATH =~ s/wujian100_open.*/wujian100_open\//;
+
+my $com_dir = `pwd`;
+chomp($com_dir);
+my $work;
+
+$work = "$wujian100_open_PATH\/workdir";
+chdir($work);
+my @file2del;
+my $dir = `pwd`;
+if($dir =~ /workdir$/) {
+	@file2del = qx(ls);
+	foreach(@file2del){
+		chomp($_);
+		if("$_" ne "CVS"){
+			!system("rm -rf $_") or die "can't rm";
+		}
+	}
+}
+else {
+	print "Error when change directory to workdir!";
+	exit(1);
+}
+print "\nStep1 (Remove all things in current 'workdir') is finished!\n";
+
+my %Opt;
+if(!&GetOptions
+	(\%Opt,
+		'--h',	                #Print help message
+		'--nodump',             #Disable the waveform dump function in VCS simulation
+		'--nomnt'))              #disable mnt module when running tb
+{
+	&print_usage();
+	exit(1);
+}
+
+
+if($Opt{'h'}) {
+	&print_usage();
+	exit(1);
+}
+
+
+
+
+my $s_vcs = 1;
+
+
+
+my $dump_sim = "";
+if(defined($Opt{'nodump'})){
+	$dump_sim = "+define+NO_DUMP";
+}
+
+
+my $s_nomnt = 0;
+if(defined($Opt{'nomnt'})){
+	$s_nomnt = 1;
+}
+my $mnt_sim = "";
+if ($s_nomnt == 1) {
+	$mnt_sim = "+define+NO_MONITOR";
+}
+
+my $cpu_model = "e902";
+
+my $hgpr= "";
+my $mad = 1;
+
+my $cpu_model_make;
+my $dahb_lite = 0;
+
+
+if("$cpu_model" eq "e902"){
+	my $temp_line;
+	my $flag_902 = 1;
+	my $bctm_902 = 0;
+	my $iabh_lite_902 = 1;
+	my $dabh_lite_902 = 0;
+           $cpu_model_make = "e902m";
+}
+
+chdir($com_dir);
+my $path;
+my $case;
+my $case_file;
+my $case_make;
+my $had_v;
+my @file;
+foreach(@ARGV){
+	if(/(.*\/)(.*)/){
+		$case_file = $_;
+		$path = $1;
+		$case = $2;
+	}else{
+		$case_file = $_;
+		$case = $_;
+		chomp($path = `pwd`);
+	}
+
+
+	if($case =~ /(.*)\.s/){
+		$case_make = $1;
+		!system("cp $case_file $wujian100_open_PATH/workdir") or die "can't copy $case_file";
+
+		if(($case =~ /.*had.*\.s/) or ($case =~ /.*gpio.*\.s/) or ($case =~ /.*connect.*\.s/) or ($case =~ /.*pulse.*\.s/) or ($case =~ /.*lpmd.*\.s/) or ($case =~ /.*int_ack.*\.s/) or ($case =~ /.*bist.*\.s/) or ($case =~ /.*e902.*nest.*\.s/)){
+			$case_file =~ s/\.s/\.v/;
+			$had_v = $case;
+			$had_v =~ s/\.s/\.v/;
+			!system("cp $case_file $wujian100_open_PATH/workdir") or die "can't copy $case_file";
+		}
+	}
+
+
+	if($case =~ /(.*)\.c/){
+		$case_make = $1;
+		chomp(@file = `ls $path`);
+		foreach(@file){
+			if(/CVS/){
+				undef $_;
+			}else{
+				my $file = "$path"."\/"."$_";
+				print "$file\n";
+				!system("cp $file $wujian100_open_PATH/workdir") or die "can't copy $file";
+				if(($case =~ /.*had.*\.c/) or ($case =~ /.*gpio.*\.c/) or ($case =~ /.*pwm.*\.c/) or ($case =~ /.*map_test.*\.c/)  or ($case =~ /.*usi.*\.c/)){
+					$case_file =~ s/\.c/\.v/;
+					$had_v = $case;
+					$had_v =~ s/\.c/\.v/;
+					!system("cp $case_file $wujian100_open_PATH/workdir") or die "can't copy $case_file";
+				}	
+			}
+			if($_=~/int_ack\w+\.v/){
+			  $had_v=$_;
+                          print "########$had_v#########\n";	
+			}
+		}
+		!system("cp $wujian100_open_PATH/lib/clib/*.h $wujian100_open_PATH/workdir") or die "can't copy clib program";
+		!system("cp $wujian100_open_PATH/lib/clib/*.c $wujian100_open_PATH/workdir") or die "can't copy clib program";
+        !system("cp $wujian100_open_PATH/lib/newlib_wrap/*.c $wujian100_open_PATH/workdir") or die "can't copy clib program";
+	}
+}
+print "\nStep2 (Process the command line arguments) is finished!\n";
+
+
+chdir($work);
+$_ = $cpu_model;
+
+if(/e902/){
+	!system("cp ../lib/Makefile ./Makefile") or die "cant't copy";
+        !system("cp ../lib/crt0.s ./crt0.s") or die "cant't copy";
+	!system("cp ../lib/linker.lcf ./linker.lcf") or die "cant't copy";
+}
+else{
+	print "Invalid CPU model!";
+	exit(1);
+}
+
+my $data_addr = 0;
+
+if($dahb_lite){
+        $data_addr = 20000000;# noted that it is hex format
+}
+else{
+        $data_addr = 20000000;
+}
+!system("sed -i 's/DATA_BADDR/0x$data_addr/g' linker.lcf") or die "cant't replace";
+
+
+!system("touch run_case.report") or die "can't touch";
+`printf "NOT RUN">run_case.report`;
+
+!system("mkdir ../regress/regress_result");
+!system("cp run_case.report ../regress/regress_result/$case_make\.report") or die "can't copy";
+
+
+!system("make clean; make all CPU=$cpu_model_make ENDIAN_MODE=little-endian FILE=$case_make HGPR=$hgpr") or die "can't make";
+print "make clean; make all CPU=$cpu_model_make ENDIAN_MODE=little-endian FILE=$case_make HGPR=$hgpr\n";
+print "\nStep3 (Make) is finished!\n";
+
+
+my $g_vlib_path;
+{
+  $g_vlib_path="+libext+.v+.sv+.inc+.h -R";
+}
+$g_vlib_path =   $g_vlib_path
+
+ 		 ." -v ../tb/tb.v"
+		 ." -v ../tb/busmnt.v"
+ 		 ." -v ../tb/virtual_counter.v"
+		 ." -y ../tb/"
+		 ." -v ../soc/sim_lib/*.v"
+                 ." -v ../soc/*.v";
+my $vcs_incdir = " +incdir+../workdir"
+
+		        ."+../soc/params"
+                        ."+../tb";
+
+my  $g_novas_pli;
+my  $PLItab;
+
+
+
+my $top_mod;
+
+  $top_mod = "$wujian100_open_PATH/tb/tb.v ";
+if($s_vcs) {
+	!system("vcs +v2k -Mupdate -sverilog   $mnt_sim $dump_sim +nospecify +notimingchecks -timescale=1ns/100ps  $top_mod   $wujian100_open_PATH/workdir/$had_v $vcs_incdir $g_vlib_path  $PLItab  ") or die "can't run VCS";
+}
+else{
+  exit(1);
+}
+print "\nStep4 (Run VCS) is finished\n";
+
+!system("cp run_case.report ../regress/regress_result/$case_make\.report") or die "can't copy";
+
+
+
+sub print_usage {
+	print << "UseOfrun_case";
+Usage: run_case [options] case_name
+	[option] =
+		[-h]: 
+			Print run_case user guider on screen
+		[-nodump]:
+			Disable the waveform dump function in VCS simulation. If not specified, dump waveform function is enabled
+		[-nomnt]:
+			Disable the monitor module when running tb, monitor is enabled without this option
+Example:
+	../tools/run_case ../case/addr_map/map_test.c
+this command means running case at workdir/ dirctory ,the CPU is RTL code, dumpon the wave from the 0 cycle, and monitor is disabled in tb.
+
+UseOfrun_case
+   print "\f";
+}

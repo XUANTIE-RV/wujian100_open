@@ -1,0 +1,122 @@
+#Copyright (c) 2019 Alibaba Group Holding Limited
+#
+#Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+#The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+#project files
+add_file -verilog "../wujian100_open_fpga_top.v"
+add_file -verilog "../../soc/ahb_matrix_top.v"
+add_file -verilog "../../soc/smu_top.v"
+add_file -verilog "../../soc/sms.v"
+add_file -verilog "../../soc/ls_sub_top.v"
+add_file -verilog "../../soc/retu_top.v"
+add_file -verilog "../../soc/tim5.v"
+add_file -verilog "../../soc/tim.v"
+add_file -verilog "../../soc/dmac.v"
+add_file -verilog "../../soc/pdu_top.v"
+add_file -verilog "../../soc/tim2.v"
+add_file -verilog "../../soc/usi1.v"
+add_file -verilog "../../soc/aou_top.v"
+add_file -verilog "../../soc/matrix.v"
+add_file -verilog "../../soc/dummy.v"
+add_file -verilog "../../soc/pwm.v"
+add_file -verilog "../../soc/usi0.v"
+add_file -verilog "../../soc/apb0_sub_top.v"
+add_file -verilog "../../soc/common.v"
+add_file -verilog "../../soc/wdt.v"
+add_file -verilog "../../soc/tim1.v"
+add_file -verilog "../../soc/rtc.v"
+add_file -verilog "../../soc/E902_20191018.v"
+add_file -verilog "../../soc/tim7.v"
+add_file -verilog "../../soc/apb0.v"
+add_file -verilog "../../soc/apb1_sub_top.v"
+add_file -verilog "../../soc/gpio0.v"
+add_file -verilog "../../soc/tim4.v"
+add_file -verilog "../../soc/tim3.v"
+add_file -verilog "../../soc/clkgen.v"
+add_file -verilog "../../soc/core_top.v"
+add_file -verilog "../../soc/tim6.v"
+add_file -verilog "../../soc/apb1.v"
+add_file -verilog "../../soc/sim_lib/PAD_DIG_IO.v"
+add_file -verilog "../../soc/sim_lib/PAD_OSC_IO.v"
+add_file -verilog "../../soc/sim_lib/fpga_byte_spram.v"
+add_file -verilog "../../soc/sim_lib/fpga_spram.v"
+add_file -constraint "wujian100_open.sdc"
+
+
+
+#implementation: "wujian100_open_200t_3b_rev"
+impl -add wujian100_open_200t_3b_rev -type fpga
+
+#
+#implementation attributes
+
+set_option -vlog_std v2001
+set_option -project_relative_includes 1
+set_option -include_path {../../soc/params/}
+
+#device options
+set_option -technology Artix7
+set_option -part XC7A200T
+set_option -package FBG484
+set_option -speed_grade -2L
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 0
+set_option -top_module "wujian100_open_top"
+
+# mapper_options
+set_option -frequency auto
+set_option -write_verilog 1
+set_option -write_vhdl 0
+set_option -srs_instrumentation 1
+
+# xilinx_options
+set_option -rw_check_on_ram 1
+set_option -reporting_ctd slack
+set_option -dw_minpower 1
+
+# Xilinx Virtex2
+set_option -run_prop_extract 1
+set_option -maxfan 10000
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# Xilinx Artix7
+set_option -use_vivado 1
+set_option -enable_prepacking 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+set_option -multi_file_compilation_unit 1
+set_option -dc_root /tools/synopsys/syn_vD-2010.03
+set_option -dw_foundation 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+
+#timing report file option
+set_option -reporting_filename "wujian100_open_200t_3b_rev/wujian100_open.ta"
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "wujian100_open_200t_3b_rev/wujian100_open.edf"
+
+#design plan options
+impl -active "wujian100_open_200t_3b_rev"

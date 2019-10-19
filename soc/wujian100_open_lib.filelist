@@ -1,0 +1,5 @@
+./sim_lib/PAD_DIG_IO.v
+./sim_lib/PAD_OSC_IO.v
+./sim_lib/STD_CELL.v
+./sim_lib/fpga_byte_spram.v
+./sim_lib/fpga_spram.v

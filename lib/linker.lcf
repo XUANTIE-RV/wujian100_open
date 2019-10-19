@@ -1,0 +1,44 @@
+/*
+Copyright (c) 2019 Alibaba Group Holding Limited
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+MEMORY
+{
+MEM1(RWX)  : ORIGIN = 0x00000000,  LENGTH = 0x10000
+MEM2(RWX)  : ORIGIN = 0x20000000,  LENGTH = 0x10000
+RAND(RW)  : ORIGIN = 0x0000eff0,  LENGTH = 0x1000
+}
+__kernel_stack = 0x2000fff8 ;
+__user_stack = 0x2000fcf8 ;
+__tkernel_stack = 0x2000f8f8 ;
+__tuser_stack = 0x2000f4f8 ;
+
+ENTRY(__start)
+
+SECTIONS {
+    .rodata :  {   *( .rodata* ) } >MEM2
+    .text :
+    {
+        crt0.o (.text)
+        *(.text*)
+        *(.rodata*)
+    } >MEM1
+    .data :
+    {
+        *(.data*)
+    } >MEM2
+    .bss :
+    {
+        *(.bss) *.(COMMON)
+    } >MEM2
+    .rand :
+    {
+        *(.rand*)
+    } >RAND
+}
