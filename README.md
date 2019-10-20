@@ -17,6 +17,12 @@
         |--workdir            //simulation directory
         |--LICENSE
         |--README.md
+# Use Tools Version:
+  VCS: vcs_vD-2010.06
+  Verdi: novas_201004
+  Synplify: Synplify_J-2015.03
+  Vivado: Vivadoi_2015.3
+  Compiler: C-SKY RISCV Tools V1.2.2 B20190731  
 # Get Start
     1. prepare a project work directory just like 'Project'
     2. cd Project
