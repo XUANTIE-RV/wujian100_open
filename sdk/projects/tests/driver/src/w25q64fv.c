@@ -2,39 +2,40 @@
  * Copyright (C) 2017-2019 Alibaba Group Holding Limited
  */
 
-
 /******************************************************************************
  * @file     w25q64fv.c
- * @brief    the main function for the w25q64fv driver
+ * @brief    the test function for the at15f512a driver
  * @version  V1.0
- * @date     02. June 2017
+ * @date     23. July 2017
  ******************************************************************************/
-
 #include <csi_config.h>
 #include "w25q64fv.h"
+#include "dtest.h"
 #include "stdio.h"
 #include "drv_spi.h"
 #include <string.h>
 #include "soc.h"
 #include "drv_gpio.h"
 #include "pin.h"
-#include <pin_name.h>
+
+#define TEST_SPI_TIMEOUT 0x100000
+static uint32_t timecount = 0;
+
+gpio_pin_handle_t pgpio_pin_handle;
 //
 // Functions
 //
-
-#define TEST_SPI_TIMEOUT 0x1000000
-static uint32_t timecount = 0;
-gpio_pin_handle_t pgpio_pin_handle;
 static int32_t spi_norflash_read_status_register(spi_handle_t handle, uint8_t *status)
 {
     uint8_t command[2] = {0x05};
+    uint8_t ret = 0;
     uint8_t data[2] = {0};
 
     /* read status register*/
 
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_transfer(handle, command, data, 2, 2);
+    ret = csi_spi_transfer(handle, &command, data, 2, 2);
+
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -49,6 +50,7 @@ static int32_t spi_norflash_read_status_register(spi_handle_t handle, uint8_t *s
 
     csi_gpio_pin_write(pgpio_pin_handle, true);
 
+    ASSERT_TRUE(ret == 0);
     *status = data[1];
     return 0;
 }
@@ -58,20 +60,24 @@ static int32_t spi_norflash_write_page(spi_handle_t handle, uint32_t dst_addr, u
     uint8_t reg1 = 0xff;
     uint8_t reg = 0x00;
     uint8_t command_enable_write = 0x06;
-    uint8_t command_page_write[W25Q64FV_PAGE_SIZE + 4] = {0x02, 0x0, 0x0, 0x0};
+    uint8_t command_page_write[132] = {0x02, 0x0, 0x0, 0x0};
+    uint8_t ret = 0;
     spi_status_t status = {0};
 
     if (len == 0 || src_buf == NULL) {
         return -1;
     }
 
+    ret = csi_spi_config(handle, W25Q64FV_CLK_RATE, SPI_MODE_MASTER, SPI_FORMAT_CPOL0_CPHA0, SPI_ORDER_MSB2LSB, SPI_SS_MASTER_SW, 8);
+    ASSERT_TRUE(ret == 0);
+
     command_page_write[1] = (dst_addr >> 16) & 0xff;
     command_page_write[2] = (dst_addr >> 8) & 0xff;
     command_page_write[3] = dst_addr & 0xff;
+
     memcpy(&command_page_write[4], src_buf, len);
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_send(handle, &command_enable_write, 1);
-
+    ret = csi_spi_send(handle, &command_enable_write, 1);
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -85,6 +91,9 @@ static int32_t spi_norflash_write_page(spi_handle_t handle, uint32_t dst_addr, u
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, true);
+
+    ASSERT_TRUE(ret == 0);
+
     timecount = 0;
 
     while ((reg & 0x2) == 0) {
@@ -93,12 +102,28 @@ static int32_t spi_norflash_write_page(spi_handle_t handle, uint32_t dst_addr, u
 
         if (timecount >= TEST_SPI_TIMEOUT) {
             printf("transfer timeout\n");
+            csi_gpio_pin_write(pgpio_pin_handle, true);
             return -1;
         }
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_send(handle, command_page_write, len + 4);
+    ret = csi_spi_send(handle, command_page_write, len + 4);
+    timecount = 0;
+
+    while (csi_spi_get_status(handle).busy) {
+        timecount++;
+
+        if (timecount >= TEST_SPI_TIMEOUT) {
+            printf("transfer timeout\n");
+            csi_gpio_pin_write(pgpio_pin_handle, true);
+            return -1;
+        }
+    }
+
+    csi_gpio_pin_write(pgpio_pin_handle, true);
+
+    ASSERT_TRUE(ret == 0);
     timecount = 0;
 
     while (1) {
@@ -112,11 +137,11 @@ static int32_t spi_norflash_write_page(spi_handle_t handle, uint32_t dst_addr, u
 
         if (timecount >= TEST_SPI_TIMEOUT) {
             printf("transfer timeout\n");
+            csi_gpio_pin_write(pgpio_pin_handle, true);
             return -1;
         }
     }
 
-    csi_gpio_pin_write(pgpio_pin_handle, true);
     timecount = 0;
 
     while (((reg1 & 0x1) == 1) || ((reg1 & 0x2) == 0x2)) {
@@ -125,11 +150,12 @@ static int32_t spi_norflash_write_page(spi_handle_t handle, uint32_t dst_addr, u
 
         if (timecount >= TEST_SPI_TIMEOUT) {
             printf("transfer timeout\n");
+            csi_gpio_pin_write(pgpio_pin_handle, true);
             return -1;
         }
     }
 
-    return len;
+    return 0;
 }
 
 /**
@@ -143,33 +169,47 @@ static int32_t spi_norflash_write_page(spi_handle_t handle, uint32_t dst_addr, u
 */
 int32_t w25q64flash_read_data(spi_handle_t handle, uint32_t addr, void *data, uint32_t cnt)
 {
-    uint8_t command[4] = {0x3, 0x0, 0x0, 0x0};
+
+    uint8_t command[8] = {0x3, 0x0, 0x0, 0x00};
+    uint8_t ret = 0;
     spi_status_t status = {0};
+    uint32_t count = 0;
+    uint8_t rxdata[8] = {0};
 
     if (!IS_FLASH_ADDR((int32_t)addr) || !(IS_FLASH_ADDR((int32_t)(addr + cnt))) || data == NULL) {
+        printf("error\n");
         return -1;
     }
 
-    command[1] = (addr >> 16) & 0xff;
-    command[2] = (addr >> 8) & 0xff;
-    command[3] = addr & 0xff;
+    ret = csi_spi_config(handle, W25Q64FV_CLK_RATE, SPI_MODE_MASTER, SPI_FORMAT_CPOL0_CPHA0, SPI_ORDER_MSB2LSB, SPI_SS_MASTER_SW, 8);
+    ASSERT_TRUE(ret == 0);
 
-    csi_gpio_pin_write(pgpio_pin_handle, false);
+    while (count < cnt) {
+        command[1] = (addr >> 16) & 0xff;
+        command[2] = (addr >> 8) & 0xff;
+        command[3] = addr & 0xff;
 
-    csi_spi_send(handle, command, 4);
-    timecount = 0;
+        csi_gpio_pin_write(pgpio_pin_handle, false);
+        csi_spi_transfer(handle, command, rxdata, 8, 8);
+        timecount = 0;
 
-    while (csi_spi_get_status(handle).busy) {
-        timecount++;
+        while (csi_spi_get_status(handle).busy) {
+            timecount++;
 
-        if (timecount >= TEST_SPI_TIMEOUT) {
-            printf("transfer timeout\n");
-            csi_gpio_pin_write(pgpio_pin_handle, true);
-            return -1;
+            if (timecount >= TEST_SPI_TIMEOUT) {
+                printf("transfer timeout\n");
+                csi_gpio_pin_write(pgpio_pin_handle, true);
+                return -1;
+            }
         }
-    }
 
-    csi_spi_receive(handle, (uint8_t *)data, cnt);
+        csi_gpio_pin_write(pgpio_pin_handle, true);
+
+        memcpy(data, &rxdata[4], 4);
+        addr = addr + 4;
+        count = count + 4;
+        data = data + 4;
+    }
 
     timecount = 0;
 
@@ -189,7 +229,6 @@ int32_t w25q64flash_read_data(spi_handle_t handle, uint32_t addr, void *data, ui
         }
     }
 
-    csi_gpio_pin_write(pgpio_pin_handle, true);
     return cnt;
 }
 
@@ -200,26 +239,22 @@ int32_t w25q64flash_read_data(spi_handle_t handle, uint32_t addr, void *data, ui
   \param[in]   id_num    Pointer to the id.
   \return      \ref execution_status
 */
-extern void csi_spi_printf_all_reg(int idx);
 int32_t w25q64flash_read_id(spi_handle_t handle, uint32_t *id_num)
 {
-    uint8_t command[3] = {0x90, 0x0, 0x0};
-
+    uint8_t command[6] = {0x90, 0x0, 0x0, 0x0, 0x0, 0x0};
+    uint8_t ret = 0;
+    uint8_t rxdata[6] = {0};
     /* read the ID*/
-
-    pgpio_pin_handle = csi_gpio_pin_initialize(EXAMPLE_PIN_SPI_CS, NULL);
-
-    if (pgpio_pin_handle == NULL) {
-        printf("gpio init error\n");
-    }
-
+    ret = csi_spi_config(handle, W25Q64FV_CLK_RATE, SPI_MODE_MASTER, SPI_FORMAT_CPOL0_CPHA0, SPI_ORDER_MSB2LSB, SPI_SS_MASTER_SW, 8);
+    ASSERT_TRUE(ret == 0);
+    drv_pinmux_config(TEST_PIN_SPI_CS, PIN_FUNC_GPIO);
+    pgpio_pin_handle = csi_gpio_pin_initialize(TEST_PIN_SPI_CS, NULL);
     csi_gpio_pin_config_mode(pgpio_pin_handle, GPIO_MODE_PULLNONE);
     csi_gpio_pin_config_direction(pgpio_pin_handle, GPIO_DIRECTION_OUTPUT);
-
     csi_gpio_pin_write(pgpio_pin_handle, true);
     csi_gpio_pin_write(pgpio_pin_handle, false);
 
-    csi_spi_send(handle, command, 1);
+    ret = csi_spi_transfer(handle, command, &rxdata, 6, 6);
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -232,20 +267,10 @@ int32_t w25q64flash_read_id(spi_handle_t handle, uint32_t *id_num)
         }
     }
 
-    csi_spi_receive(handle, (uint8_t *)id_num, 5);
-
-    while (csi_spi_get_status(handle).busy) {
-        timecount++;
-
-        if (timecount >= TEST_SPI_TIMEOUT) {
-            printf("transfer timeout\n");
-            csi_gpio_pin_write(pgpio_pin_handle, true);
-            return -1;
-        }
-    }
-
     csi_gpio_pin_write(pgpio_pin_handle, true);
 
+    ASSERT_TRUE(ret == 0);
+    memcpy((uint8_t *)id_num, &rxdata[4], 2);
     return 0;
 }
 
@@ -262,17 +287,17 @@ int32_t w25q64flash_erase_sector(spi_handle_t handle, uint32_t addr)
     uint8_t reg = 0x0;
     uint8_t command_enable_write = 0x06;
     uint8_t command_erase_sector[4] = {0x52, 0x0, 0x0, 0x0};
+    uint8_t ret = 0;
 
-    if (!IS_FLASH_ADDR((int32_t)addr)) {
-        return -1;
-    }
+    ret = csi_spi_config(handle, W25Q64FV_CLK_RATE, SPI_MODE_MASTER, SPI_FORMAT_CPOL0_CPHA0, SPI_ORDER_MSB2LSB, SPI_SS_MASTER_SW, 8);
+    ASSERT_TRUE(ret == 0);
 
     command_erase_sector[1] = (addr >> 16) & 0xff;
     command_erase_sector[2] = (addr >> 8) & 0xff;
     command_erase_sector[3] = addr & 0xff;
 
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_send(handle, &command_enable_write, 1);
+    ret = csi_spi_send(handle, &command_enable_write, 1);
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -286,6 +311,8 @@ int32_t w25q64flash_erase_sector(spi_handle_t handle, uint32_t addr)
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, true);
+
+    ASSERT_TRUE(ret == 0);
     timecount = 0;
 
     while ((reg & 0x2) == 0) {
@@ -300,7 +327,7 @@ int32_t w25q64flash_erase_sector(spi_handle_t handle, uint32_t addr)
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_send(handle, command_erase_sector, 4);
+    ret = csi_spi_send(handle, command_erase_sector, 4);
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -314,6 +341,8 @@ int32_t w25q64flash_erase_sector(spi_handle_t handle, uint32_t addr)
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, true);
+
+    ASSERT_TRUE(ret == 0);
     timecount = 0;
 
     while (((reg1 & 0x1) == 1) || ((reg1 & 0x2) == 0x2)) {
@@ -343,10 +372,14 @@ int32_t w25q64flash_erase_chip(spi_handle_t handle)
     uint8_t reg = 0x0;
     uint8_t command_enable_write = 0x06;
     uint8_t command_erase_chip = 0x62;
+    uint8_t ret = 0;
+
+
+    ret = csi_spi_config(handle, W25Q64FV_CLK_RATE, SPI_MODE_MASTER, SPI_FORMAT_CPOL0_CPHA0, SPI_ORDER_MSB2LSB, SPI_SS_MASTER_SW, 8);
+    ASSERT_TRUE(ret == 0);
 
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_send(handle, &command_enable_write, 1);
-
+    ret = csi_spi_send(handle, &command_enable_write, 1);
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -360,6 +393,8 @@ int32_t w25q64flash_erase_chip(spi_handle_t handle)
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, true);
+
+    ASSERT_TRUE(ret == 0);
     timecount = 0;
 
     while ((reg & 0x2) == 0) {
@@ -374,8 +409,7 @@ int32_t w25q64flash_erase_chip(spi_handle_t handle)
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, false);
-    csi_spi_send(handle, &command_erase_chip, 1);
-
+    ret = csi_spi_send(handle, &command_erase_chip, 1);
     timecount = 0;
 
     while (csi_spi_get_status(handle).busy) {
@@ -389,6 +423,8 @@ int32_t w25q64flash_erase_chip(spi_handle_t handle)
     }
 
     csi_gpio_pin_write(pgpio_pin_handle, true);
+
+    ASSERT_TRUE(ret == 0);
     timecount = 0;
 
     while (((reg1 & 0x1) == 1) || ((reg1 & 0x2) == 0x2)) {
@@ -420,7 +456,7 @@ int32_t w25q64flash_program_data(spi_handle_t handle, uint32_t addr, const void 
     uint8_t *p = (uint8_t *)data;
     uint32_t page_num;
     uint8_t i;
-    int32_t ret = 0;
+    uint8_t ret = 0;
     uint32_t program_length = 0;
     uint8_t tmp[W25Q64FV_PAGE_SIZE];
 

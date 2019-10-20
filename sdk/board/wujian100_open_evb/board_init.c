@@ -38,3 +38,8 @@ void board_init(void)
         return;
     }
 }
+
+int32_t drv_get_cpu_id(void)
+{
+    return 0;
+}

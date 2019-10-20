@@ -20,44 +20,13 @@ extern "C" {
 
 #define TEST_TIMER  1
 #define TEST_USART  1
-//#define TEST_SPU_USART  1
-//#define TEST_USI_USART  1
 #define TEST_GPIO   1
-//#define TEST_EFLASH 1
-//#define TEST_SPIFLASH 1
-//#define TEST_IIC        1
-//#define TEST_SPU_IIC    1
-//#define TEST_USI_IIC    1
-//#define TEST_SPI        1
-//#define TEST_SPU_SPI    1
-//#define TEST_USI_SPI    1
-//#define TEST_CRC    1
-//#define TEST_AES    1
-//#define TEST_TRNG   1
-//#define TEST_RSA    1
-//#define TEST_SHA    1
-//#define TEST_PWM    1
-//#define TEST_DMAC   1
-//#define TEST_ETH    1
-//#define TEST_RTC    1
-//#define TEST_WDT    1
-//#define TEST_I2S    1
-
-/* EFLASH case config */
-#define EFLASH_GET_INFO_EN  0x1
-#define EFLASH_ERASE_EN     0x1
-#define EFLASH_PROGRAM_EN   0x1
-#define EFLASH_PROGRAM_INTERFACE_EN         0x1
-#define EFLASH_READ_INTERFACE_EN            0x1
-#define EFLASH_ERASE_SECTOR_INTERFACE_EN    0x1
-
-/* SPIFLASH case config */
-#define SPIFLASH_GET_INFO_EN  0x1
-#define SPIFLASH_ERASE_EN     0x1
-#define SPIFLASH_PROGRAM_EN   0x1
-#define SPIFLASH_PROGRAM_INTERFACE_EN         0x1
-#define SPIFLASH_READ_INTERFACE_EN            0x1
-#define SPIFLASH_ERASE_SECTOR_INTERFACE_EN    0x1
+#define TEST_IIC        1
+#define TEST_SPI        1
+#define TEST_PWM    1
+#define TEST_DMAC   1
+#define TEST_RTC    1
+#define TEST_WDT    1
 
 
 /* GPIO case config */
@@ -117,12 +86,6 @@ extern "C" {
 #define SPI_TEST_W25Q64FV_PROGRAM_EN        0x1
 #define SPI_TEST_W25Q64FV_READ_EN           0x1
 #define SPI_TEST_CONFIG_INTERFACE_EN         0x1
-
-#define NET_TEST_FUN_EN         0x1
-#define NET_TEST_INTERFACE_EN   0x1
-
-/* I2S case config */
-#define I2S_TEST_INTERFACE_EN 0x1
 
 #ifdef __cplusplus
 }
