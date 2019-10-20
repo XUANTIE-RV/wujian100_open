@@ -48,6 +48,6 @@
 # How to get the IDE for development
     download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs   
 # Reference  and Thanks
-    The program model of GPIO reference to the DesignWare of Synopsys 
-    The program model of Timer reference to the DesignWare of Synopsys 
-    The program model of WDT reference to the DesignWare of Synopsys 
+    The program model of GPIO refer to the DesignWare of Synopsys 
+    The program model of Timer refer to the DesignWare of Synopsys 
+    The program model of WDT refer to the DesignWare of Synopsys 
