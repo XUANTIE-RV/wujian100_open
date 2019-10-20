@@ -49,7 +49,49 @@
 # How to get the debug tool
     download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs 
 # How to get the IDE for development
-    download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs   
+    download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs  
+# How to use the sdk
+wujian100_open SDK is wujian100_open software development kit, the software follows the CSI interface specification. Through the SDK users can quickly wujian100_open test and evaluation. At the same time users can refer to the SDK integration of various commonly used components and sample procedures for application development quickly form a product solution.
+```
+SDK directory structure:
+|--sdk
+ |--csi_core 	//CSI-Core related interface definition, and interface implementation on
+                //E902.
+ |--csi_dirver  //CSI-Driver related interface definition, and peripheral Driver
+                //implementation.
+ |--csi_kernel  //CSI-Kernel related interface definition, and Rhino, FreeRTOSv8.2.3
+                //ucos-iii and other real-time operating system docking example code
+ |--libs        //Store common library implementations
+ |--projicet	//Store a variety of reference examples including benchmark test
+                //program, driver example program, rtos example program. The relevant
+                //project documents are also included.
+ |--utilites	//Store project config files.
+ |--VERSION
+```
+    1. Download and install the CDK
+    2. Open a project using CDK, for example open the hello project:
+      projects/examples/hello_world/CDK/wj100-open-hello_world.cdkproj
+    3. Build the project:
+    Click "project" on the toolbar,and select "build all". After successful compilation, you will see the following:
+
+```
+Build target ' wujian100_open-hello_world BuildSet '
+----------Building project:[ wujian100_open-hello_world - BuildSet ]----------
+make[1]: Entering directory 'D:/release/Wujian100_open-V1.0.0/Wujian100_open-V1.0.0/projects/examples/hello_world/CDK'
+make[1]: Leaving directory 'D:/release/Wujian100_open-V1.0.0/Wujian100_open-V1.0.0/projects/examples/hello_world/CDK'
+make[1]: Entering directory 'D:/release/Wujian100_open-V1.0.0/Wujian100_open-V1.0.0/projects/examples/hello_world/CDK'
+linking...
+size of target:
+   text	   data	    bss	    dec	    hex	filename
+  22680	   1628	   6660	  30968	   78f8	D:/release/Wujian100_open-V1.0.0/Wujian100_open-V1.0.0/projects/examples/hello_world/CDK/Obj/wujian100_open-hello_world.elf
+checksum value of target:  0xE2B2C769 (491,388)
+make[1]: Leaving directory 'D:/release/Wujian100_open-V1.0.0/Wujian100_open-V1.0.0/projects/examples/hello_world/CDK'
+Executing Post Build commands ...
+Done
+====0 errors, 0 warnings, total time : 20s263ms====
+```
+    4. Run the project:
+    Click "Debug" on the toolbar,and select "Start/Stop Dubegger".
 # Reference  and Thanks
     The program model of GPIO refer to the DesignWare of Synopsys 
     The program model of Timer refer to the DesignWare of Synopsys 
