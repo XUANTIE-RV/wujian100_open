@@ -39,6 +39,22 @@ extern "C" {
 #define EXAMPLE_BOARD_GPIO_PIN_NAME "A1"
 #define EXAMPLE_GPIO_PIN_FUNC   0
 
+#define EXAMPLE_SPI_IDX                 1
+#define EXAMPLE_PIN_SPI_MOSI            0
+#define EXAMPLE_PIN_SPI_MISO            0
+#define EXAMPLE_PIN_SPI_CS              0
+#define EXAMPLE_PIN_SPI_SCK             0
+#define EXAMPLE_PIN_SPI_MOSI_FUNC       0
+#define EXAMPLE_PIN_SPI_MISO_FUNC       0
+#define EXAMPLE_PIN_SPI_CS_FUNC         0
+#define EXAMPLE_PIN_SPI_SCK_FUNC        0
+
+#define EXAMPLE_IIC_IDX                 0
+#define EXAMPLE_PIN_IIC_SDA             0
+#define EXAMPLE_PIN_IIC_SCL             0
+#define EXAMPLE_PIN_IIC_SDA_FUNC        0
+#define EXAMPLE_PIN_IIC_SCL_FUNC        0
+
 /* tests pin manager */
 #define TEST_USART_IDX       0
 #define TEST_PIN_USART_TX    PAD_UART0_SIN
@@ -104,6 +120,8 @@ extern "C" {
 #define TEST_PWM_CH4_FUNC            0
 #define TEST_PWM_CH5                 0
 #define TEST_PWM_CH5_FUNC            0
+
+#define PIN_FUNC_GPIO                0
 
 #ifdef __cplusplus
 }
