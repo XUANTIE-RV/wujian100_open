@@ -147,12 +147,14 @@
           <File Name="../../../../projects/tests/driver/src/test_timer.c"/>
           <File Name="../../../../projects/tests/driver/src/test_usart.c"/>
           <File Name="../../../../projects/tests/driver/src/test_wdt.c"/>
+		  <File Name="../../../../projects/tests/driver/src/w25q64fv.c"/>
         </VirtualDirectory>
       </VirtualDirectory>
       <VirtualDirectory Name="dtest">
         <File Name="../../../../projects/tests/dtest/dtest.c"/>
         <VirtualDirectory Name="include">
           <File Name="../../../../projects/tests/dtest/include/dtest.h"/>
+		  <File Name="../../../../projects/tests/driver/src/w25q64fv.h"/>
         </VirtualDirectory>
       </VirtualDirectory>
     </VirtualDirectory>
