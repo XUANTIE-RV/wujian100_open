@@ -1,8 +1,5 @@
 # wujian100_open
     wujian100_open is a MCU base SoC. We can simulate by EDA tools and emulate by FPGA. Also we can develop the IPs and software in this platform. We wish more and more developers building the open MCU ecosystem with T-Head. IC design and development should be faster simpler and more reliable
-    If you want to discuss about the wujian100_open project. You can scan the QR code below：
-![barcode.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/barcode.jpg) 
-
     Directory Structure
     |--Project                //open source project work directory  
       |--riscv_toolchain      //tool chain install directory download from t-head.cn
@@ -49,7 +46,7 @@
 # How to get the FPGA board
     We will provide 100 FPGA board for evlalution free. Everyone can apply the FPGA board from pingtouge.
     apply from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs
-![board.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/board.jpg)
+![board.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/b.jpg)
 # How to get the debug tool
     download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs 
 # How to get the IDE for development
@@ -96,6 +93,8 @@ Done
 ```
     4. Run the project:
     Click "Debug" on the toolbar,and select "Start/Stop Dubegger".
+    If you want to discuss about the wujian100_open project. You can scan the QR code below：
+![barcode.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/q.jpg) 
 # Reference  and Thanks
     The program model of GPIO refer to the DesignWare of Synopsys 
     The program model of Timer refer to the DesignWare of Synopsys 
