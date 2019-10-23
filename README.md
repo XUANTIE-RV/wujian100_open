@@ -16,7 +16,7 @@
         |--workdir            //simulation directory
         |--LICENSE
         |--README.md
-# Get Start
+# Get Started
     1. prepare a project work directory just like 'Project'
     2. cd Project
     3. git clone https://github.com/T-head-Semi/wujian100_open.git or git clone git@github.com:T-head-Semi/wujian100_open.git
