@@ -93,6 +93,7 @@ Done
 ```
     4. Run the project:
     Click "Debug" on the toolbar,and select "Start/Stop Dubegger".
+# Dicussion
     If you want to discuss about the wujian100_open project. You can scan the QR code below：
 ![barcode.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/q.jpg) 
 # Reference  and Thanks
