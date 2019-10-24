@@ -1,4 +1,4 @@
-# wujian100_open
+# #3wujian100_open
     wujian100_open is a MCU base SoC. We can simulate by EDA tools and emulate by FPGA. Also we can develop the IPs and software in this platform. We wish more and more developers building the open MCU ecosystem with T-Head. IC design and development should be faster simpler and more reliable
     Directory Structure
     |--Project                //open source project work directory  
