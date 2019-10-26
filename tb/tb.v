@@ -25,7 +25,13 @@ module wujian100_open_tb ();
 `define CLKMUX_EHS_CLK_DURATION 25 
 
 `define CLKMUX_ELS_CLK_DURATION 15258.789
-static integer FILE;
+
+`ifdef iverilog
+  integer FILE;
+`else
+  static integer FILE;
+`endif
+
 reg     [31:0]  cpuclk_counter;           
 reg             i_ext_pad_clkmux_ehs_clk; 
 reg             i_ext_pad_clkmux_els_clk; 

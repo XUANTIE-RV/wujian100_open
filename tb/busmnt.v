@@ -24,7 +24,12 @@ wire    [31:0]  ahb_xx_hwdata;
 wire            ahb_xx_hwrite;  
 wire            sysrst_b;    
 wire            sysclk;         
-static integer FILE;
+
+`ifdef iverilog
+  integer FILE;
+`else
+  static integer FILE;
+`endif
 
 `define CPU_TOP wujian100_open_tb.x_wujian100_open_top.x_cpu_top
 
