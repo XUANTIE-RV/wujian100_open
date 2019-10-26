@@ -16,7 +16,7 @@
         |--workdir            //simulation directory
         |--LICENSE
         |--README.md
-# Get Start
+# Get Started
     1. prepare a project work directory just like 'Project'
     2. cd Project
     3. git clone https://github.com/T-head-Semi/wujian100_open.git or git clone git@github.com:T-head-Semi/wujian100_open.git
@@ -92,7 +92,7 @@ Done
 ====0 errors, 0 warnings, total time : 20s263ms====
 ```
     4. Run the project:
-    Click "Debug" on the toolbar,and select "Start/Stop Dubegger".
+    Click "Debug" on the toolbar,and select "Start/Stop Debugger".
 # Dicussion
     If you want to discuss about the wujian100_open project. You can scan the QR code below：
 ![barcode.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/q.jpg) 
