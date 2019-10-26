@@ -11,7 +11,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 MEMORY
 {
 MEM1(RWX)  : ORIGIN = 0x00000000,  LENGTH = 0x10000
-MEM2(RWX)  : ORIGIN = 0x20000000,  LENGTH = 0x10000
 RAND(RW)  : ORIGIN = 0x0000eff0,  LENGTH = 0x1000
 }
 __kernel_stack = 0x2000fff8 ;
@@ -22,7 +21,6 @@ __tuser_stack = 0x2000f4f8 ;
 ENTRY(__start)
 
 SECTIONS {
-    .rodata :  {   *( .rodata* ) } >MEM2
     .text :
     {
         crt0.o (.text)
@@ -32,11 +30,12 @@ SECTIONS {
     .data :
     {
         *(.data*)
-    } >MEM2
+    } >MEM1
     .bss :
     {
         *(.bss) *.(COMMON)
-    } >MEM2
+    } >MEM1
+    .rodata :  {   *( .rodata* ) } >MEM1
     .rand :
     {
         *(.rand*)

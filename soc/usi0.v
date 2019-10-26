@@ -386,7 +386,7 @@ wire            uart_stop_clr;
 wire            uart_stop_intr;     
 wire            usi_intr;           
 wire            wr_clk_div;         
-parameter TP = 1;
+parameter TP = 0;
 always@(posedge clk or negedge rst_n)
 begin
     if(~rst_n)

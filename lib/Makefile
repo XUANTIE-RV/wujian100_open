@@ -65,21 +65,14 @@ ${FILE}.elf : ${OBJECTS} linker.lcf
 ${FILE}.obj : ${FILE}.elf
 	${OBJDUMP} ${OBJDUMPFLAGS} $< > $@
 
-INST_HEX = ${FILE}_inst.hex
-DATA_HEX = ${FILE}_data.hex
 
 ${FILE}.hex : ${FILE}.elf
-	${OBJCOPY} ${HEXFLAGS} $< ${INST_HEX} -j .text  -j .rand
-	${OBJCOPY} ${HEXFLAGS} $< ${DATA_HEX} -j .data -j .rodata -j .bss
 	${OBJCOPY} ${HEXFLAGS} $< $@ 
 
-INST_PAT = inst.pat
-DATA_PAT = data.pat
 
 %.pat	: %.hex
 	rm -f *.pat
-	${CONVERT} ${INST_HEX} ${INST_PAT}
-	${CONVERT} ${DATA_HEX} ${DATA_PAT}
+	${CONVERT} $< test.pat
 
 
 #--------------------------------------------------------------------

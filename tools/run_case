@@ -49,6 +49,7 @@ if(!&GetOptions
 	(\%Opt,
 		'--h',	                #Print help message
 		'--nodump',             #Disable the waveform dump function in VCS simulation
+		'--sim_tool:s',         #Specify the simulation tools, support vcs and iverilog
 		'--nomnt'))              #disable mnt module when running tb
 {
 	&print_usage();
@@ -64,7 +65,17 @@ if($Opt{'h'}) {
 
 
 
-my $s_vcs = 1;
+my $s_vcs = 0;
+my $s_iverilog = 0;
+if(!defined($Opt{'sim_tool'}) || ($Opt{'sim_tool'} eq "vcs")){
+	$s_vcs = 1;
+}elsif($Opt{'sim_tool'} eq "iverilog"){
+	$s_iverilog = 1;
+}
+if(!$s_vcs && !$s_iverilog){
+	print "Invalid simulation tool! Support vcs or iverilog.\n";
+	exit(1);
+}
 
 
 
@@ -225,12 +236,15 @@ my $top_mod;
 
   $top_mod = "$wujian100_open_PATH/tb/tb.v ";
 if($s_vcs) {
-	!system("vcs +v2k -Mupdate -sverilog   $mnt_sim $dump_sim +nospecify +notimingchecks -timescale=1ns/100ps  $top_mod   $wujian100_open_PATH/workdir/$had_v $vcs_incdir $g_vlib_path  $PLItab  ") or die "can't run VCS";
+	!system("vcs +v2k -Mupdate -sverilog   $mnt_sim $dump_sim +nospecify +notimingchecks -timescale=1ns/100ps  $top_mod   $wujian100_open_PATH/workdir/$had_v $vcs_incdir $g_vlib_path  $PLItab  ") or die "can't run VCS";}
+elsif($s_iverilog){
+	!system("iverilog -o test.vvp -Diverilog=1 -g2012 ../tb/busmnt.v  ../tb/tb.v ../tb/virtual_counter.v -f ../soc/wujian100_open_syn_for_iverilog.filelist -f ../soc/wujian100_open_lib_for_iverilog.filelist $wujian100_open_PATH/workdir/$had_v") or die "can't run iverilog";
+        !system("vvp test.vvp") or die "can't run vvp";
 }
 else{
   exit(1);
 }
-print "\nStep4 (Run VCS) is finished\n";
+print "\nStep4 (Run simulation) is finished\n";
 
 !system("cp run_case.report ../regress/regress_result/$case_make\.report") or die "can't copy";
 
@@ -244,6 +258,8 @@ Usage: run_case [options] case_name
 			Print run_case user guider on screen
 		[-nodump]:
 			Disable the waveform dump function in VCS simulation. If not specified, dump waveform function is enabled
+[-sim_tool vcs|iverilog]:      
+        		Specify the simulation tools, support vcs and iverilog
 		[-nomnt]:
 			Disable the monitor module when running tb, monitor is enabled without this option
 Example:

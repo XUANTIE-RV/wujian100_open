@@ -10,11 +10,18 @@
 
 
 #set VCS path
-setenv VCS_HOME 
-set path=($VCS_HOME/linux/bin $path)
+#setenv VCS_HOME 
+#set path=($VCS_HOME/linux/bin $path)
 
 #set VCS license
-setenv SNPSLMD_LICENSE_FILE
+#setenv SNPSLMD_LICENSE_FILE 
+
+#set iverilog path
+set iverilog_path=(/usr/bin)
+set gtkwave_path=(/usr/bin)
+set path=($iverilog_path $path)
+set path=($gtkwave_path $path)
+
 
 #set tools path
 setenv TOOL_PATH ../../riscv_toolchain

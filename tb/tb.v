@@ -252,8 +252,12 @@ begin : load_program
 integer j;
 integer k;
   reg [31:0] one_word;
+`ifdef iverilog
+  reg [31:0]  temp_mem[16384];
+`else
   reg [31:0]  temp_mem[integer];
-  $readmemh("inst.pat", temp_mem);
+`endif
+  $readmemh("test.pat", temp_mem);
    @( posedge PI_SOC_RST_B);
  for(k=0; k<32'h4000; k=k+1)
     begin
@@ -266,21 +270,12 @@ integer k;
 end
 
 
-reg [31:0] mem_data_temp [integer];
 initial
 begin : load_data
   integer j;
    @( posedge PI_SOC_RST_B);
   $display("\t******START TO LOAD PROGRAM******\n");
-  $readmemh("data.pat", mem_data_temp);
-  for(j=0;j<mem_data_temp.size;j=j+1)
-  begin
-      wujian100_open_tb.x_wujian100_open_top.x_retu_top.x_smu_top.x_sms_top.x_sms0_top.x_sms_sram.x_fpga_spram.x_fpga_byte3_spram.mem[j][7:0] = mem_data_temp[j][7:0];
-      wujian100_open_tb.x_wujian100_open_top.x_retu_top.x_smu_top.x_sms_top.x_sms0_top.x_sms_sram.x_fpga_spram.x_fpga_byte2_spram.mem[j][7:0] = mem_data_temp[j][15:8];
-      wujian100_open_tb.x_wujian100_open_top.x_retu_top.x_smu_top.x_sms_top.x_sms0_top.x_sms_sram.x_fpga_spram.x_fpga_byte1_spram.mem[j][7:0] = mem_data_temp[j][23:16];
-      wujian100_open_tb.x_wujian100_open_top.x_retu_top.x_smu_top.x_sms_top.x_sms0_top.x_sms_sram.x_fpga_spram.x_fpga_byte0_spram.mem[j][7:0] = mem_data_temp[j][31:24];
-  end
-  for(j=mem_data_temp.size;j<32'h4000;j=j+1)
+  for(j=0;j<32'h4000;j=j+1)
   begin
       wujian100_open_tb.x_wujian100_open_top.x_retu_top.x_smu_top.x_sms_top.x_sms0_top.x_sms_sram.x_fpga_spram.x_fpga_byte3_spram.mem[j][7:0] = 8'h0;
       wujian100_open_tb.x_wujian100_open_top.x_retu_top.x_smu_top.x_sms_top.x_sms0_top.x_sms_sram.x_fpga_spram.x_fpga_byte2_spram.mem[j][7:0] = 8'h0;
