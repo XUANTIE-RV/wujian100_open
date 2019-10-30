@@ -3,7 +3,7 @@
  */
 
 /******************************************************************************
- * @file     dw_gpio.c
+ * @file     wj_oip_gpio.c
  * @brief    CSI Source File for GPIO Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -15,7 +15,7 @@
 #include <drv_irq.h>
 #include <drv_gpio.h>
 #include <drv_pmu.h>
-#include <dw_gpio.h>
+#include <wj_oip_gpio.h>
 #include <csi_core.h>
 #include <pin_name.h>
 
@@ -38,20 +38,20 @@ typedef struct {
     gpio_direction_e dir;       ///< gpio direction
     uint32_t mask;              ///< gpio mask bit
     uint32_t value;             ///< gpio value
-} dw_gpio_priv_t;
+} wj_oip_gpio_priv_t;
 
 typedef struct {
     uint8_t     portidx;
     uint8_t     idx;
     uint8_t     offset;
     gpio_event_cb_t cb;
-} dw_gpio_pin_priv_t;
+} wj_oip_gpio_pin_priv_t;
 
 extern int32_t target_gpio_port_init(port_name_e port, uint32_t *base, uint32_t *irq, void **handler, uint32_t *pin_num);
 extern int32_t target_gpio_pin_init(int32_t gpio_pin, uint32_t *port_idx);
 
-static dw_gpio_priv_t gpio_handle[CONFIG_GPIO_NUM];
-static dw_gpio_pin_priv_t gpio_pin_handle[CONFIG_GPIO_PIN_NUM];
+static wj_oip_gpio_priv_t gpio_handle[CONFIG_GPIO_NUM];
+static wj_oip_gpio_pin_priv_t gpio_pin_handle[CONFIG_GPIO_PIN_NUM];
 
 //
 // Functions
@@ -61,8 +61,8 @@ static int32_t gpio_set_direction(
     gpio_direction_e direction
 )
 {
-    dw_gpio_priv_t *gpio_priv = port;
-    dw_gpio_reg_t *gpio_reg = (dw_gpio_reg_t *)(gpio_priv->base);
+    wj_oip_gpio_priv_t *gpio_priv = port;
+    wj_oip_gpio_reg_t *gpio_reg = (wj_oip_gpio_reg_t *)(gpio_priv->base);
 
     if (direction == GPIO_DIRECTION_INPUT) {
         gpio_reg->SWPORT_DDR &= (~gpio_priv->mask);
@@ -84,8 +84,8 @@ static int32_t gpio_set_direction(
 
 static int32_t gpio_read(void *port, uint32_t *value)
 {
-    dw_gpio_priv_t *gpio_priv = port;
-    dw_gpio_control_reg_t *gpio_control_reg = (dw_gpio_control_reg_t *)(gpio_priv->base + 0x30);
+    wj_oip_gpio_priv_t *gpio_priv = port;
+    wj_oip_gpio_control_reg_t *gpio_control_reg = (wj_oip_gpio_control_reg_t *)(gpio_priv->base + 0x30);
     *value = gpio_control_reg->EXT_PORTA;
     return 0;
 }
@@ -101,8 +101,8 @@ static int32_t gpio_read(void *port, uint32_t *value)
 
 static int32_t gpio_write(void *port, uint32_t mask)
 {
-    dw_gpio_priv_t *gpio_priv = port;
-    dw_gpio_reg_t *gpio_reg = (dw_gpio_reg_t *)(gpio_priv->base);
+    wj_oip_gpio_priv_t *gpio_priv = port;
+    wj_oip_gpio_reg_t *gpio_reg = (wj_oip_gpio_reg_t *)(gpio_priv->base);
 
     uint32_t value = gpio_reg->SWPORT_DR;
 
@@ -120,12 +120,12 @@ static int32_t gpio_write(void *port, uint32_t mask)
  */
 static int32_t gpio_set_irq_mode(gpio_pin_handle_t pin, gpio_irq_mode_e irq_mode)
 {
-    dw_gpio_pin_priv_t *gpio_pin_priv = pin;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = pin;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
 
-    dw_gpio_control_reg_t *gpio_control_reg = (dw_gpio_control_reg_t *)(port_handle->base + 0x30);
+    wj_oip_gpio_control_reg_t *gpio_control_reg = (wj_oip_gpio_control_reg_t *)(port_handle->base + 0x30);
     uint32_t offset = gpio_pin_priv->idx;
     uint32_t mask = 1 << offset;
 
@@ -174,12 +174,12 @@ static int32_t gpio_set_irq_mode(gpio_pin_handle_t pin, gpio_irq_mode_e irq_mode
 
 static void gpio_irq_clear(gpio_pin_handle_t pin, uint32_t idx)
 {
-    dw_gpio_pin_priv_t *gpio_pin_priv = pin;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = pin;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
 
-    dw_gpio_control_reg_t *gpio_control_reg = (dw_gpio_control_reg_t *)(port_handle->base + 0x30);
+    wj_oip_gpio_control_reg_t *gpio_control_reg = (wj_oip_gpio_control_reg_t *)(port_handle->base + 0x30);
 
     gpio_control_reg->PORTA_EOI = idx;
 }
@@ -193,12 +193,12 @@ static void gpio_irq_clear(gpio_pin_handle_t pin, uint32_t idx)
  */
 static void gpio_irq_enable(gpio_pin_handle_t pin)
 {
-    dw_gpio_pin_priv_t *gpio_pin_priv = pin;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = pin;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
 
-    dw_gpio_control_reg_t *gpio_control_reg = (dw_gpio_control_reg_t *)(port_handle->base + 0x30);
+    wj_oip_gpio_control_reg_t *gpio_control_reg = (wj_oip_gpio_control_reg_t *)(port_handle->base + 0x30);
     uint32_t offset = gpio_pin_priv->idx;
     uint32_t val = gpio_control_reg->INTEN;
     val |= (1 << offset);
@@ -215,25 +215,25 @@ static void gpio_irq_enable(gpio_pin_handle_t pin)
 
 static void gpio_irq_disable(gpio_pin_handle_t pin)
 {
-    dw_gpio_pin_priv_t *gpio_pin_priv = pin;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = pin;
     uint32_t offset = gpio_pin_priv->idx;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
 
-    dw_gpio_control_reg_t *gpio_control_reg = (dw_gpio_control_reg_t *)(port_handle->base + 0x30);
+    wj_oip_gpio_control_reg_t *gpio_control_reg = (wj_oip_gpio_control_reg_t *)(port_handle->base + 0x30);
     uint32_t val = gpio_control_reg->INTEN;
     val &= ~(1 << offset);
     gpio_control_reg->INTEN = val;
 }
 
-void dw_gpio_irqhandler(int idx)
+void wj_oip_gpio_irqhandler(int idx)
 {
     if (idx >= CONFIG_GPIO_NUM) {
         return;
     }
 
-    dw_gpio_control_reg_t *gpio_control_reg = (dw_gpio_control_reg_t *)(gpio_handle[idx].base + 0x30);
+    wj_oip_gpio_control_reg_t *gpio_control_reg = (wj_oip_gpio_control_reg_t *)(gpio_handle[idx].base + 0x30);
 
     uint32_t value = gpio_control_reg->INTSTATUS;
     uint8_t i;
@@ -257,7 +257,7 @@ void dw_gpio_irqhandler(int idx)
             }
 
 #endif
-            dw_gpio_pin_priv_t *gpio_pin_priv = (dw_gpio_pin_priv_t *)&gpio_pin_handle[pin_idx];
+            wj_oip_gpio_pin_priv_t *gpio_pin_priv = (wj_oip_gpio_pin_priv_t *)&gpio_pin_handle[pin_idx];
 
             gpio_irq_clear(gpio_pin_priv, (1 << i));  //clear the gpio interrupt
 
@@ -277,7 +277,7 @@ void dw_gpio_irqhandler(int idx)
 */
 gpio_port_handle_t csi_gpio_port_initialize(int32_t port)
 {
-    dw_gpio_priv_t *gpio_priv = NULL;
+    wj_oip_gpio_priv_t *gpio_priv = NULL;
 
     /* obtain the gpio port information */
     uint32_t base = 0u;
@@ -315,7 +315,7 @@ int32_t csi_gpio_port_uninitialize(gpio_port_handle_t handle)
 {
     GPIO_NULL_PARAM_CHK(handle);
 
-    dw_gpio_priv_t *gpio_priv = handle;
+    wj_oip_gpio_priv_t *gpio_priv = handle;
 
     drv_irq_disable(gpio_priv->irq);
     drv_irq_unregister(gpio_priv->irq);
@@ -330,7 +330,7 @@ int32_t csi_gpio_port_uninitialize(gpio_port_handle_t handle)
 #ifdef CONFIG_LPM
 static void manage_clock(gpio_pin_handle_t handle, uint8_t enable)
 {
-    dw_gpio_pin_priv_t *gpio_pin_priv = (dw_gpio_pin_priv_t *)handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = (wj_oip_gpio_pin_priv_t *)handle;
     uint8_t device[] = {CLOCK_MANAGER_GPIO0, CLOCK_MANAGER_GPIO1};
 
     drv_clock_manager_config(device[gpio_pin_priv->portidx], enable);
@@ -338,7 +338,7 @@ static void manage_clock(gpio_pin_handle_t handle, uint8_t enable)
 
 static void do_prepare_sleep_action(void *handle)
 {
-    dw_gpio_priv_t *gpio_handle = handle;
+    wj_oip_gpio_priv_t *gpio_handle = handle;
     uint32_t *gbase = (uint32_t *)(gpio_handle->base);
     uint32_t *control_base = (uint32_t *)(gpio_handle->base + 0x30);
     registers_save(gpio_handle->gpio_regs_saved, gbase, 3);
@@ -347,7 +347,7 @@ static void do_prepare_sleep_action(void *handle)
 
 static void do_wakeup_sleep_action(void *handle)
 {
-    dw_gpio_priv_t *gpio_handle = handle;
+    wj_oip_gpio_priv_t *gpio_handle = handle;
     uint32_t *gbase = (uint32_t *)(gpio_handle->base);
     uint32_t *control_base = (uint32_t *)(gpio_handle->base + 0x30);
     registers_restore(gbase, gpio_handle->gpio_regs_saved, 3);
@@ -389,7 +389,7 @@ gpio_pin_handle_t csi_gpio_pin_initialize(int32_t gpio_pin, gpio_event_cb_t cb_e
         idx += (gpio_handle[i].pin_num);
     }
 
-    dw_gpio_pin_priv_t *gpio_pin_priv = &(gpio_pin_handle[idx]);
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = &(gpio_pin_handle[idx]);
     gpio_pin_priv->portidx = port_idx;
 
 
@@ -411,7 +411,7 @@ int32_t csi_gpio_pin_uninitialize(gpio_pin_handle_t handle)
         return ERR_GPIO(DRV_ERROR_PARAMETER);
     }
 
-    dw_gpio_pin_priv_t *gpio_pin_priv = (dw_gpio_pin_priv_t *)handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = (wj_oip_gpio_pin_priv_t *)handle;
     gpio_pin_priv->cb = NULL;
 
     gpio_irq_disable(handle);
@@ -430,7 +430,7 @@ int32_t csi_gpio_power_control(gpio_pin_handle_t handle, csi_power_stat_e state)
     GPIO_NULL_PARAM_CHK(handle);
 
 #ifdef CONFIG_LPM
-    dw_gpio_pin_priv_t *gpio_pin_priv = (dw_gpio_pin_priv_t *)handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = (wj_oip_gpio_pin_priv_t *)handle;
     power_cb_t callback = {
         .wakeup = do_wakeup_sleep_action,
         .sleep = do_prepare_sleep_action,
@@ -454,7 +454,7 @@ int32_t csi_gpio_pin_config_mode(gpio_pin_handle_t handle,
     GPIO_NULL_PARAM_CHK(handle);
 
     /* config the gpio pin mode direction mask bits */
-    dw_gpio_pin_priv_t *gpio_pin_priv = handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = handle;
 
     uint8_t offset = gpio_pin_priv->idx;
 
@@ -474,10 +474,10 @@ int32_t csi_gpio_pin_config_direction(gpio_pin_handle_t handle,
     GPIO_NULL_PARAM_CHK(handle);
 
     /* config the gpio pin mode direction mask bits */
-    dw_gpio_pin_priv_t *gpio_pin_priv = handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = handle;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *gpio_priv = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *gpio_priv = &gpio_handle[gpio_pin_priv->portidx];
 
     gpio_priv->dir = dir;
     gpio_priv->mask = 1 << gpio_pin_priv->idx;
@@ -505,10 +505,10 @@ int32_t csi_gpio_pin_config(gpio_pin_handle_t handle,
     GPIO_NULL_PARAM_CHK(handle);
 
     /* config the gpio pin mode direction mask bits */
-    dw_gpio_pin_priv_t *gpio_pin_priv = handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = handle;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *gpio_priv = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *gpio_priv = &gpio_handle[gpio_pin_priv->portidx];
 
     gpio_priv->mode = mode;
     gpio_priv->dir = dir;
@@ -534,10 +534,10 @@ int32_t csi_gpio_pin_write(gpio_pin_handle_t handle, bool value)
 {
     GPIO_NULL_PARAM_CHK(handle);
 
-    dw_gpio_pin_priv_t *gpio_pin_priv = handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = handle;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
 
     uint8_t offset = gpio_pin_priv->idx;
     uint32_t port_value = value << offset;
@@ -560,12 +560,12 @@ int32_t csi_gpio_pin_read(gpio_pin_handle_t handle, bool *value)
     GPIO_NULL_PARAM_CHK(handle);
     GPIO_NULL_PARAM_CHK(value);
 
-    dw_gpio_pin_priv_t *gpio_pin_priv = handle;
+    wj_oip_gpio_pin_priv_t *gpio_pin_priv = handle;
     uint32_t port_value;
     uint8_t offset = gpio_pin_priv->idx;
 
     /* convert portidx to port handle */
-    dw_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
+    wj_oip_gpio_priv_t *port_handle = &gpio_handle[gpio_pin_priv->portidx];
 
     gpio_read(port_handle, &port_value);
     *value = (port_value & (1 << offset)) >> offset;

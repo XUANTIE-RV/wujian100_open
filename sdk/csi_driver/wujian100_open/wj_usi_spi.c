@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     ck_usi_spi.c
+ * @file     wj_usi_spi.c
  * @brief    CSI Source File for USI SPI Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -14,7 +14,7 @@
 #include <string.h>
 #include <drv_irq.h>
 #include <drv_usi_spi.h>
-#include <ck_usi_spi.h>
+#include <wj_usi_spi.h>
 #include <drv_gpio.h>
 #include <soc.h>
 
@@ -50,23 +50,23 @@ typedef struct {
 #define TRANSFER_STAT_TRAN      3
     uint8_t  transfer_stat;     //TRANSFER_STAT_* : 0 - idle, 1 - send , 2 -receive , 3 - transceive
     uint32_t tot_num;
-} ck_usi_spi_priv_t;
+} wj_usi_spi_priv_t;
 
 int32_t target_usi_spi_init(int32_t idx, uint32_t *base, uint32_t *irq, void **handler, uint32_t *ssel);
-static ck_usi_spi_priv_t spi_instance[CONFIG_USI_NUM];
+static wj_usi_spi_priv_t spi_instance[CONFIG_USI_NUM];
 static gpio_pin_handle_t   pgpio_pin_handle;
 
 static const spi_capabilities_t spi_capabilities = {
     .simplex = 1,           /* Simplex Mode (Master and Slave) */
     .ti_ssi = 0,            /* TI Synchronous Serial Interface */
     .microwire = 0,         /* Microwire Interface */
-    .event_mode_fault = 0   /* Signal Mode Fault event: \ref CSKY_SPI_EVENT_MODE_FAULT */
+    .event_mode_fault = 0   /* Signal Mode Fault event: \ref WUJIAN_SPI_EVENT_MODE_FAULT */
 };
 
 /**
   \brief use gpio pin to simulate ss line for hardware controlled Output mode.
 */
-static int32_t ck_spi_ss_init(ck_usi_spi_priv_t *spi_priv)
+static int32_t wj_spi_ss_init(wj_usi_spi_priv_t *spi_priv)
 {
     pgpio_pin_handle = csi_gpio_pin_initialize(spi_priv->ssel, NULL);
     csi_gpio_pin_config_mode(pgpio_pin_handle, GPIO_MODE_PULLNONE);
@@ -79,7 +79,7 @@ static int32_t ck_spi_ss_init(ck_usi_spi_priv_t *spi_priv)
 /**
   \brief control ss line depend on controlled Output mode.
 */
-static int32_t ck_spi_ss_control(ck_usi_spi_priv_t *spi_priv, spi_ss_stat_e stat)
+static int32_t wj_spi_ss_control(wj_usi_spi_priv_t *spi_priv, spi_ss_stat_e stat)
 {
     if (spi_priv->ss_mode == SPI_SS_MASTER_HW_OUTPUT) {
         if (stat == SPI_SS_INACTIVE) {
@@ -104,11 +104,11 @@ int32_t drv_usi_spi_config_datawidth(spi_handle_t handle, uint32_t datawidth)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
-    if ((datawidth >= (CKENUM_SPI_DATASIZE_4 + 1)) && (datawidth <= (CKENUM_SPI_DATASIZE_16  + 1))) {
-        addr->USI_SPI_CTRL &= CK_USI_SPI_CTRL_DATA_SIZE;
+    if ((datawidth >= (WJENUM_SPI_DATASIZE_4 + 1)) && (datawidth <= (WJENUM_SPI_DATASIZE_16  + 1))) {
+        addr->USI_SPI_CTRL &= WJ_USI_SPI_CTRL_DATA_SIZE;
         addr->USI_SPI_CTRL |= (datawidth - 1);
 
         spi_priv->state |= SPI_CONFIGURED;
@@ -128,8 +128,8 @@ int32_t drv_usi_spi_config_baudrate(spi_handle_t handle, uint32_t baud)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     if (spi_priv->status.busy) {
         return ERR_SPI(DRV_ERROR_BUSY);
@@ -154,19 +154,19 @@ int32_t drv_usi_spi_config_baudrate(spi_handle_t handle, uint32_t baud)
   \param[in]   polarity spi polarity
   \return      error code
 */
-static int32_t ck_spi_set_polarity(ck_usi_reg_t *addr, CKENUM_SPI_POLARITY polarity)
+static int32_t wj_spi_set_polarity(wj_usi_reg_t *addr, WJENUM_SPI_POLARITY polarity)
 {
     /* To config the polarity, we can set the usi_spi_ctrl bit(7) as below:
      *     0 - inactive state of serial clock is low
      *     1 - inactive state of serial clock is high
      */
     switch (polarity) {
-        case CKENUM_SPI_CLOCK_POLARITY_LOW:
-            addr->USI_SPI_CTRL &= (~CK_USI_SPI_CTRL_CPOL);
+        case WJENUM_SPI_CLOCK_POLARITY_LOW:
+            addr->USI_SPI_CTRL &= (~WJ_USI_SPI_CTRL_CPOL);
             break;
 
-        case CKENUM_SPI_CLOCK_POLARITY_HIGH:
-            addr->USI_SPI_CTRL |= CK_USI_SPI_CTRL_CPOL;
+        case WJENUM_SPI_CLOCK_POLARITY_HIGH:
+            addr->USI_SPI_CTRL |= WJ_USI_SPI_CTRL_CPOL;
             break;
 
         default:
@@ -182,15 +182,15 @@ static int32_t ck_spi_set_polarity(ck_usi_reg_t *addr, CKENUM_SPI_POLARITY polar
   \param[in]   phase    Serial clock phase
   \return      error code
 */
-static int32_t ck_spi_set_phase(ck_usi_reg_t *addr, CKENUM_SPI_PHASE phase)
+static int32_t wj_spi_set_phase(wj_usi_reg_t *addr, WJENUM_SPI_PHASE phase)
 {
     switch (phase) {
-        case CKENUM_SPI_CLOCK_PHASE_MIDDLE:
-            addr->USI_SPI_CTRL &= (~CK_USI_SPI_CTRL_CPHA);
+        case WJENUM_SPI_CLOCK_PHASE_MIDDLE:
+            addr->USI_SPI_CTRL &= (~WJ_USI_SPI_CTRL_CPHA);
             break;
 
-        case CKENUM_SPI_CLOCK_PHASE_START:
-            addr->USI_SPI_CTRL |= CK_USI_SPI_CTRL_CPHA;
+        case WJENUM_SPI_CLOCK_PHASE_START:
+            addr->USI_SPI_CTRL |= WJ_USI_SPI_CTRL_CPHA;
             break;
 
         default:
@@ -210,43 +210,43 @@ int32_t drv_usi_spi_config_format(spi_handle_t handle, spi_format_e format)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     if (spi_priv->status.busy) {
         return ERR_SPI(DRV_ERROR_BUSY);
     }
 
-    CKENUM_SPI_POLARITY polarity;
-    CKENUM_SPI_PHASE phase;
+    WJENUM_SPI_POLARITY polarity;
+    WJENUM_SPI_PHASE phase;
 
     switch (format) {
         case SPI_FORMAT_CPOL0_CPHA0:
-            polarity = CKENUM_SPI_CLOCK_POLARITY_LOW;
-            phase = CKENUM_SPI_CLOCK_PHASE_MIDDLE;
+            polarity = WJENUM_SPI_CLOCK_POLARITY_LOW;
+            phase = WJENUM_SPI_CLOCK_PHASE_MIDDLE;
             break;
 
         case SPI_FORMAT_CPOL0_CPHA1:
-            polarity = CKENUM_SPI_CLOCK_POLARITY_LOW;
-            phase = CKENUM_SPI_CLOCK_PHASE_START;
+            polarity = WJENUM_SPI_CLOCK_POLARITY_LOW;
+            phase = WJENUM_SPI_CLOCK_PHASE_START;
             break;
 
         case SPI_FORMAT_CPOL1_CPHA0:
-            polarity = CKENUM_SPI_CLOCK_POLARITY_HIGH;
-            phase = CKENUM_SPI_CLOCK_PHASE_MIDDLE;
+            polarity = WJENUM_SPI_CLOCK_POLARITY_HIGH;
+            phase = WJENUM_SPI_CLOCK_PHASE_MIDDLE;
             break;
 
         case SPI_FORMAT_CPOL1_CPHA1:
-            polarity = CKENUM_SPI_CLOCK_POLARITY_HIGH;
-            phase = CKENUM_SPI_CLOCK_PHASE_START;
+            polarity = WJENUM_SPI_CLOCK_POLARITY_HIGH;
+            phase = WJENUM_SPI_CLOCK_PHASE_START;
             break;
 
         default:
             return ERR_SPI(SPI_ERROR_FRAME_FORMAT);
     }
 
-    ck_spi_set_polarity(addr, polarity);
-    ck_spi_set_phase(addr, phase);
+    wj_spi_set_polarity(addr, polarity);
+    wj_spi_set_phase(addr, phase);
 
     spi_priv->state |= SPI_CONFIGURED;
 
@@ -263,8 +263,8 @@ int32_t drv_usi_spi_config_mode(spi_handle_t handle, spi_mode_e mode)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     if (spi_priv->status.busy) {
         return ERR_SPI(DRV_ERROR_BUSY);
@@ -272,10 +272,10 @@ int32_t drv_usi_spi_config_mode(spi_handle_t handle, spi_mode_e mode)
 
     if (mode == SPI_MODE_MASTER) {
         spi_priv->state |= SPI_CONFIGURED;
-        addr->USI_SPI_MODE |= CK_USI_SPI_MODE_MASTER;
+        addr->USI_SPI_MODE |= WJ_USI_SPI_MODE_MASTER;
         return 0;
     } else if (mode == SPI_MODE_SLAVE) {
-        addr->USI_SPI_MODE &= ~CK_USI_SPI_MODE_MASTER;
+        addr->USI_SPI_MODE &= ~WJ_USI_SPI_MODE_MASTER;
     }
 
     return ERR_SPI(DRV_ERROR_UNSUPPORTED);;
@@ -289,7 +289,7 @@ int32_t drv_usi_spi_config_mode(spi_handle_t handle, spi_mode_e mode)
 int32_t drv_usi_spi_config_block_mode(spi_handle_t handle, int32_t flag)
 {
     SPI_NULL_PARAM_CHK(handle);
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if (flag == 1) {
         spi_priv->block_mode = 1;
@@ -310,7 +310,7 @@ int32_t drv_usi_spi_config_block_mode(spi_handle_t handle, int32_t flag)
 int32_t drv_usi_spi_config_bit_order(spi_handle_t handle, spi_bit_order_e order)
 {
     SPI_NULL_PARAM_CHK(handle);
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if (spi_priv->status.busy) {
         return ERR_SPI(DRV_ERROR_BUSY);
@@ -334,7 +334,7 @@ int32_t drv_usi_spi_config_ss_mode(spi_handle_t handle, spi_ss_mode_e ss_mode)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if (spi_priv->status.busy) {
         return ERR_SPI(DRV_ERROR_BUSY);
@@ -346,7 +346,7 @@ int32_t drv_usi_spi_config_ss_mode(spi_handle_t handle, spi_ss_mode_e ss_mode)
             break;
 
         case SPI_SS_MASTER_HW_OUTPUT:
-            ck_spi_ss_init(spi_priv);
+            wj_spi_ss_init(spi_priv);
             break;
 
         default:
@@ -365,10 +365,10 @@ int32_t drv_usi_spi_config_ss_mode(spi_handle_t handle, spi_ss_mode_e ss_mode)
   \return      error code
 */
 
-static int32_t ck_spi_set_mode(spi_handle_t handle, CKENUM_SPI_MODE mode)
+static int32_t wj_spi_set_mode(spi_handle_t handle, WJENUM_SPI_MODE mode)
 {
-    ck_usi_spi_priv_t *spi_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     /* It is impossible to write to this register when the SSI is enabled.*/
     /* we can set the TMOD to config transfer mode as below:
@@ -379,19 +379,19 @@ static int32_t ck_spi_set_mode(spi_handle_t handle, CKENUM_SPI_MODE mode)
      *         1          1             reserved
      */
     switch (mode) {
-        case CKENUM_SPI_TXRX:
-            addr->USI_SPI_CTRL &= ~CK_USI_SPI_CTRL_TMODE;
-            addr->USI_SPI_CTRL |= CK_USI_SPI_CTRL_TMODE_TXRX;
+        case WJENUM_SPI_TXRX:
+            addr->USI_SPI_CTRL &= ~WJ_USI_SPI_CTRL_TMODE;
+            addr->USI_SPI_CTRL |= WJ_USI_SPI_CTRL_TMODE_TXRX;
             break;
 
-        case CKENUM_SPI_TX:
-            addr->USI_SPI_CTRL &= ~CK_USI_SPI_CTRL_TMODE;
-            addr->USI_SPI_CTRL |= CK_USI_SPI_CTRL_TMODE_TX;
+        case WJENUM_SPI_TX:
+            addr->USI_SPI_CTRL &= ~WJ_USI_SPI_CTRL_TMODE;
+            addr->USI_SPI_CTRL |= WJ_USI_SPI_CTRL_TMODE_TX;
             break;
 
-        case CKENUM_SPI_RX:
-            addr->USI_SPI_CTRL &= ~CK_USI_SPI_CTRL_TMODE;
-            addr->USI_SPI_CTRL |= CK_USI_SPI_CTRL_TMODE_RX;
+        case WJENUM_SPI_RX:
+            addr->USI_SPI_CTRL &= ~WJ_USI_SPI_CTRL_TMODE;
+            addr->USI_SPI_CTRL |= WJ_USI_SPI_CTRL_TMODE_RX;
             break;
 
         default:
@@ -406,9 +406,9 @@ static int32_t ck_spi_set_mode(spi_handle_t handle, CKENUM_SPI_MODE mode)
   \brief       interrupt service function for receive FIFO full interrupt .
   \param[in]   spi_priv pointer to spi private.
 */
-static void ck_spi_intr_rx_full(ck_usi_spi_priv_t *spi_priv)
+static void wj_spi_intr_rx_full(wj_usi_spi_priv_t *spi_priv)
 {
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     uint8_t *pbuffer = spi_priv->recv_buf;
     uint32_t length = spi_priv->recv_num;
@@ -433,14 +433,14 @@ static void ck_spi_intr_rx_full(ck_usi_spi_priv_t *spi_priv)
         addr->USI_EN = 0x0;
         spi_priv->recv_num = 0;
 
-        ck_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
 
         if (spi_priv->cb_event) {
             spi_priv->cb_event(spi_priv->idx, SPI_EVENT_RX_COMPLETE);
             return;
         }
     } else {
-        ck_spi_set_mode(spi_priv, CKENUM_SPI_RX);
+        wj_spi_set_mode(spi_priv, WJENUM_SPI_RX);
         spi_priv->recv_buf = pbuffer;
         spi_priv->recv_num = length;
     }
@@ -451,14 +451,14 @@ static void ck_spi_intr_rx_full(ck_usi_spi_priv_t *spi_priv)
   \brief       interrupt service function for transmit FIFO empty interrupt.
   \param[in]   spi_priv pointer to spi private.
 */
-static void ck_spi_intr_tx_empty(ck_usi_spi_priv_t *spi_priv)
+static void wj_spi_intr_tx_empty(wj_usi_spi_priv_t *spi_priv)
 {
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     /* transfer mode:transmit & receive */
     uint32_t i = 0u;
 
-    if (spi_priv->mode == CKENUM_SPI_TXRX) {
+    if (spi_priv->mode == WJENUM_SPI_TXRX) {
         /* read data out from rx FIFO */
         while (spi_priv->transfer_num) {
             *spi_priv->recv_buf = addr->USI_TX_RX_FIFO;
@@ -498,11 +498,11 @@ static void ck_spi_intr_tx_empty(ck_usi_spi_priv_t *spi_priv)
         addr->USI_INTR_EN &= ~USI_INT_TX_EMPTY;
         spi_priv->status.busy = 0U;
         spi_priv->send_num = 0;
-        ck_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
         addr->USI_EN = 0x0;
         addr->USI_EN = 0xf;
 
-        if (spi_priv->mode == CKENUM_SPI_TXRX) {
+        if (spi_priv->mode == WJENUM_SPI_TXRX) {
             if (spi_priv->cb_event) {
                 spi_priv->cb_event(spi_priv->idx, SPI_EVENT_TRANSFER_COMPLETE);
                 return;
@@ -522,22 +522,22 @@ static void ck_spi_intr_tx_empty(ck_usi_spi_priv_t *spi_priv)
   \brief       handler the interrupt.
   \param[in]   spi      Pointer to \ref SPI_RESOURCES
 */
-void ck_usi_spi_irqhandler(int32_t idx)
+void wj_usi_spi_irqhandler(int32_t idx)
 {
-    ck_usi_spi_priv_t *spi_priv = &spi_instance[idx];
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = &spi_instance[idx];
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     uint32_t intr_state = addr->USI_INTR_STA & 0x3ffff;
 
     /* deal with receive FIFO full interrupt */
     if (intr_state & USI_INT_SPI_STOP) {
-        ck_spi_intr_rx_full(spi_priv);
+        wj_spi_intr_rx_full(spi_priv);
         addr->USI_INTR_CLR = USI_INT_SPI_STOP;
     }
 
     /* deal with transmit FIFO empty interrupt */
     if (intr_state & USI_INT_TX_EMPTY) {
-        ck_spi_intr_tx_empty(spi_priv);
+        wj_spi_intr_tx_empty(spi_priv);
         addr->USI_INTR_CLR = USI_INT_TX_EMPTY;
     }
 
@@ -571,7 +571,7 @@ spi_handle_t drv_usi_spi_initialize(int32_t idx, spi_event_cb_t cb_event)
     }
 
 
-    ck_usi_spi_priv_t *spi_priv = &spi_instance[idx];
+    wj_usi_spi_priv_t *spi_priv = &spi_instance[idx];
 
     spi_priv->base = base;
     spi_priv->irq  = irq;
@@ -584,10 +584,10 @@ spi_handle_t drv_usi_spi_initialize(int32_t idx, spi_event_cb_t cb_event)
     spi_priv->enable_slave      = 1U;
     spi_priv->state             = SPI_INITIALIZED;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     addr->USI_MODE_SEL = USI_MODE_SPI;
-    addr->USI_SPI_MODE = CK_USI_SPI_MODE_MASTER;   /* spi master mode */
+    addr->USI_SPI_MODE = WJ_USI_SPI_MODE_MASTER;   /* spi master mode */
 
     drv_irq_register(spi_priv->irq, handler);
     drv_irq_enable(spi_priv->irq);
@@ -604,7 +604,7 @@ int32_t drv_usi_spi_uninitialize(spi_handle_t handle)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     spi_priv->cb_event          = NULL;
     spi_priv->state             = 0U;
@@ -618,7 +618,7 @@ int32_t drv_usi_spi_uninitialize(spi_handle_t handle)
         return ERR_SPI(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
     drv_irq_disable(spi_priv->irq);
     drv_irq_unregister(spi_priv->irq);
     addr->USI_EN = 0x0;
@@ -662,7 +662,7 @@ int32_t drv_usi_spi_config(spi_handle_t handle,
                            int32_t          bit_width)
 {
     SPI_NULL_PARAM_CHK(handle);
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if ((spi_priv->state & SPI_INITIALIZED) == 0U) {
         return ERR_SPI(DRV_ERROR_UNSUPPORTED);
@@ -676,7 +676,7 @@ int32_t drv_usi_spi_config(spi_handle_t handle,
     spi_priv->status.data_lost  = 0U;
     spi_priv->status.mode_fault = 0U;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
     addr->USI_EN = 0;
 
     int32_t ret = 0;
@@ -766,7 +766,7 @@ int32_t drv_usi_spi_send(spi_handle_t handle, const void *data, uint32_t num)
         return ERR_SPI(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if ((spi_priv->state & SPI_CONFIGURED) == 0U) {
         return ERR_SPI(DRV_ERROR_UNSUPPORTED);
@@ -782,8 +782,8 @@ int32_t drv_usi_spi_send(spi_handle_t handle, const void *data, uint32_t num)
     spi_priv->tot_num           = num;
     spi_priv->transfer_stat     = TRANSFER_STAT_SEND;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
-    ck_spi_set_mode(spi_priv, CKENUM_SPI_TX);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
+    wj_spi_set_mode(spi_priv, WJENUM_SPI_TX);
     uint8_t *ptxbuffer = (uint8_t *)data;
 
     if (spi_priv->block_mode) {
@@ -791,7 +791,7 @@ int32_t drv_usi_spi_send(spi_handle_t handle, const void *data, uint32_t num)
 
         uint32_t once_len, i;
         addr->USI_EN    = 0xf;
-        ck_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
 
         while (spi_priv->send_num) {
             int timeout = 1000000;
@@ -807,7 +807,7 @@ int32_t drv_usi_spi_send(spi_handle_t handle, const void *data, uint32_t num)
             spi_priv->send_num -= once_len;
         }
 
-        ck_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
         spi_priv->status.busy   = 0U;
         addr->USI_EN = 0;
     } else {
@@ -815,7 +815,7 @@ int32_t drv_usi_spi_send(spi_handle_t handle, const void *data, uint32_t num)
         spi_priv->clk_num       = num;
         spi_priv->send_buf      = ptxbuffer;
         spi_priv->transfer_num  = 0;
-        ck_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
         addr->USI_EN            = 0x3;
         addr->USI_EN            = 0xf;
         addr->USI_INTR_EN       = USI_INT_TX_EMPTY | USI_INT_TX_WERR | USI_INT_TX_RERR;
@@ -843,7 +843,7 @@ int32_t drv_usi_spi_receive(spi_handle_t handle, void *data, uint32_t num)
         return ERR_SPI(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if ((spi_priv->state & SPI_CONFIGURED) == 0U) {
         return ERR_SPI(DRV_ERROR_UNSUPPORTED);
@@ -859,18 +859,18 @@ int32_t drv_usi_spi_receive(spi_handle_t handle, void *data, uint32_t num)
     spi_priv->tot_num           = num;
     spi_priv->transfer_stat     = TRANSFER_STAT_RCV;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
     uint8_t *prx_buffer = data;
 
     if (1) {
-        ck_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
 
         spi_priv->recv_buf = prx_buffer;
         spi_priv->recv_num = num;
 
         while (spi_priv->recv_num) {
             int timeout = 1000000;
-            ck_spi_set_mode(spi_priv, CKENUM_SPI_TXRX);
+            wj_spi_set_mode(spi_priv, WJENUM_SPI_TXRX);
 
             addr->USI_EN = 0x0;
             addr->USI_EN = 0xf;
@@ -895,7 +895,7 @@ int32_t drv_usi_spi_receive(spi_handle_t handle, void *data, uint32_t num)
             spi_priv->recv_num -= once_len;
         }
 
-        ck_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
         spi_priv->status.busy   = 0U;
         addr->USI_EN = 3;
 
@@ -903,12 +903,12 @@ int32_t drv_usi_spi_receive(spi_handle_t handle, void *data, uint32_t num)
             spi_priv->cb_event(spi_priv->idx, SPI_EVENT_RX_COMPLETE);
         }
     } else {
-        ck_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
 
         spi_priv->recv_buf = prx_buffer;
         spi_priv->recv_num = num;
-        ck_spi_set_mode(spi_priv, CKENUM_SPI_RX);
-        //ck_usi_set_rxfifo_th(addr, num);
+        wj_spi_set_mode(spi_priv, WJENUM_SPI_RX);
+        //wj_usi_set_rxfifo_th(addr, num);
 
         addr->USI_EN = 0x3;
         addr->USI_EN = 0xf;
@@ -939,7 +939,7 @@ int32_t drv_usi_spi_transfer(spi_handle_t handle, const void *data_out, void *da
         return ERR_SPI(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if ((spi_priv->state & SPI_CONFIGURED) == 0U) {
         return ERR_SPI(DRV_ERROR_UNSUPPORTED);
@@ -956,10 +956,10 @@ int32_t drv_usi_spi_transfer(spi_handle_t handle, const void *data_out, void *da
     spi_priv->tot_num = (num_out > num_in) ? num_out : num_in;
     spi_priv->transfer_stat     = TRANSFER_STAT_TRAN;
 
-    ck_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_spi_ss_control(spi_priv, SPI_SS_ACTIVE);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
-    ck_spi_set_mode(spi_priv, CKENUM_SPI_TXRX);
+    wj_spi_set_mode(spi_priv, WJENUM_SPI_TXRX);
     uint8_t *ptx_buffer = (uint8_t *)data_out;
     uint8_t *prx_buffer = (uint8_t *)data_in;
     uint32_t i = 0u;
@@ -993,7 +993,7 @@ int32_t drv_usi_spi_transfer(spi_handle_t handle, const void *data_out, void *da
             spi_priv->tot_num -= txrx_num;
         }
 
-        ck_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
+        wj_spi_ss_control(spi_priv, SPI_SS_INACTIVE);
         spi_priv->status.busy = 0U;
         addr->USI_EN = 3;
     } else {
@@ -1005,7 +1005,7 @@ int32_t drv_usi_spi_transfer(spi_handle_t handle, const void *data_out, void *da
         spi_priv->transfer_num  = 0;
         addr->USI_EN    = USI_FM_EN | USI_USI_EN;
         addr->USI_EN    = 0xf;
-        //ck_usi_set_rxfifo_th(addr, spi_priv->tot_num);
+        //wj_usi_set_rxfifo_th(addr, spi_priv->tot_num);
         /* enable transmit FIFO empty interrupt */
         addr->USI_INTR_UNMASK |= USI_INT_TX_EMPTY | USI_INT_TX_WERR | USI_INT_TX_RERR;
         addr->USI_INTR_EN |= USI_INT_TX_EMPTY | USI_INT_TX_WERR | USI_INT_TX_RERR;
@@ -1023,8 +1023,8 @@ int32_t drv_usi_spi_abort_transfer(spi_handle_t handle)
 {
     SPI_NULL_PARAM_CHK(handle);
 
-    ck_usi_spi_priv_t *spi_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(spi_priv->base);
+    wj_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(spi_priv->base);
 
     addr->USI_EN = 0x0;
     spi_priv->status.busy = 0U;
@@ -1047,7 +1047,7 @@ spi_status_t drv_usi_spi_get_status(spi_handle_t handle)
         return spi_status;
     }
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     return spi_priv->status;
 }
@@ -1075,7 +1075,7 @@ uint32_t drv_usi_spi_get_data_count(spi_handle_t handle)
     SPI_NULL_PARAM_CHK(handle);
     uint32_t cnt = 0;
 
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if (spi_priv->transfer_stat == TRANSFER_STAT_SEND) {
         cnt = spi_priv->tot_num - spi_priv->send_num;
@@ -1097,12 +1097,12 @@ uint32_t drv_usi_spi_get_data_count(spi_handle_t handle)
 int32_t drv_usi_spi_ss_control(spi_handle_t handle, spi_ss_stat_e stat)
 {
     SPI_NULL_PARAM_CHK(handle);
-    ck_usi_spi_priv_t *spi_priv = handle;
+    wj_usi_spi_priv_t *spi_priv = handle;
 
     if ((stat != SPI_SS_INACTIVE) && (stat != SPI_SS_ACTIVE)) {
         return ERR_SPI(DRV_ERROR_PARAMETER);
     }
 
-    return ck_spi_ss_control(spi_priv, stat);
+    return wj_spi_ss_control(spi_priv, stat);
 }
 

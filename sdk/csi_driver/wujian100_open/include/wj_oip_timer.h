@@ -3,13 +3,13 @@
  */
 
 /******************************************************************************
- * @file     dw_timer.h
+ * @file     wj_oip_timer.h
  * @brief    header file for timer driver
  * @version  V1.0
  * @date     02. June 2017
  ******************************************************************************/
-#ifndef __DW_TIMER_H
-#define __DW_TIMER_H
+#ifndef __WJ_OIP_TIMER_H
+#define __WJ_OIP_TIMER_H
 
 #include <stdio.h>
 #include "soc.h"
@@ -21,12 +21,12 @@ extern "C" {
 /*
  *  define the bits for TxControl
  */
-#define DW_TIMER_TXCONTROL_ENABLE      (1UL << 0)
-#define DW_TIMER_TXCONTROL_MODE        (1UL << 1)
-#define DW_TIMER_TXCONTROL_INTMASK     (1UL << 2)
-#define DW_TIMER_TXCONTROL_TRIGGER     (1UL << 4)
+#define WJ_OIP_TIMER_TXCONTROL_ENABLE      (1UL << 0)
+#define WJ_OIP_TIMER_TXCONTROL_MODE        (1UL << 1)
+#define WJ_OIP_TIMER_TXCONTROL_INTMASK     (1UL << 2)
+#define WJ_OIP_TIMER_TXCONTROL_TRIGGER     (1UL << 4)
 
-#define DW_TIMER_INIT_DEFAULT_VALUE     (0xffffffff / drv_get_timer_freq(0) * 1000000)
+#define WJ_OIP_TIMER_INIT_DEFAULT_VALUE     (0xffffffff / drv_get_timer_freq(0) * 1000000)
 
 typedef struct {
     __IOM uint32_t TxLoadCount;              /* Offset: 0x000 (R/W)  Receive buffer register */
@@ -37,11 +37,11 @@ typedef struct {
     uint8_t  RESERVED1[3];
     __IM uint8_t TxIntStatus: 1;             /* Offset: 0x010 (R)  Interrupt enable register */
     uint8_t  RESERVED2[3];
-} dw_timer_reg_t;
+} wj_oip_timer_reg_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __DW_TIMER_H */
+#endif /* __WJ_OIP_TIMER_H */
 

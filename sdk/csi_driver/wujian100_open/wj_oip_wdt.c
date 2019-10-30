@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     dw_wdt.c
+ * @file     wj_oip_wdt.c
  * @brief    CSI Source File for WDT Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <drv_irq.h>
 #include <drv_wdt.h>
-#include <dw_wdt.h>
+#include <wj_oip_wdt.h>
 #include <soc.h>
 #include <csi_core.h>
 
@@ -32,21 +32,21 @@ typedef struct {
     uint32_t base;
     uint32_t irq;
     wdt_event_cb_t cb_event;
-} dw_wdt_priv_t;
+} wj_oip_wdt_priv_t;
 
 extern int32_t target_get_wdt_count(void);
 extern int32_t target_get_wdt(int32_t idx, uint32_t *base, uint32_t *irq, void **handler);
 
-static dw_wdt_priv_t wdt_instance[CONFIG_WDT_NUM];
+static wj_oip_wdt_priv_t wdt_instance[CONFIG_WDT_NUM];
 
-static inline void dw_wdt_enable(dw_wdt_reg_t *addr)
+static inline void wj_oip_wdt_enable(wj_oip_wdt_reg_t *addr)
 {
     uint32_t value = addr->WDT_CR;
     value |= 1 << 0;
     addr->WDT_CR = value;
 }
 
-static inline void dw_wdt_disable(dw_wdt_reg_t *addr)
+static inline void wj_oip_wdt_disable(wj_oip_wdt_reg_t *addr)
 {
     uint32_t value = addr->WDT_CR;
     value &= ~(1 << 0);
@@ -54,10 +54,10 @@ static inline void dw_wdt_disable(dw_wdt_reg_t *addr)
 }
 
 
-void dw_wdt_irqhandler(int32_t idx)
+void wj_oip_wdt_irqhandler(int32_t idx)
 {
-    dw_wdt_priv_t *wdt_priv = &wdt_instance[idx];
-    dw_wdt_reg_t *addr = (dw_wdt_reg_t *)(wdt_priv->base);
+    wj_oip_wdt_priv_t *wdt_priv = &wdt_instance[idx];
+    wj_oip_wdt_reg_t *addr = (wj_oip_wdt_reg_t *)(wdt_priv->base);
 
     addr->WDT_EOI;
 
@@ -74,14 +74,14 @@ static void manage_clock(wdt_handle_t handle, uint8_t enable)
 
 static void do_prepare_sleep_action(wdt_handle_t handle)
 {
-    dw_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_priv_t *wdt_priv = handle;
     uint32_t *wbase = (uint32_t *)(wdt_priv->base);
     registers_save(wdt_priv->wdt_regs_saved, wbase, 2);
 }
 
 static void do_wakeup_sleep_action(wdt_handle_t handle)
 {
-    dw_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_priv_t *wdt_priv = handle;
     uint32_t *wbase = (uint32_t *)(wdt_priv->base);
     registers_restore(wbase, wdt_priv->wdt_regs_saved, 2);
 }
@@ -109,7 +109,7 @@ wdt_handle_t csi_wdt_initialize(int32_t idx, wdt_event_cb_t cb_event)
         return NULL;
     }
 
-    dw_wdt_priv_t *wdt_priv = &wdt_instance[idx];
+    wj_oip_wdt_priv_t *wdt_priv = &wdt_instance[idx];
     wdt_priv->base = base;
     wdt_priv->irq  = irq;
 
@@ -140,7 +140,7 @@ int32_t csi_wdt_uninitialize(wdt_handle_t handle)
 {
     WDT_NULL_PARAM_CHK(handle);
 
-    dw_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_priv_t *wdt_priv = handle;
 
     wdt_priv->cb_event = NULL;
     drv_irq_disable(wdt_priv->irq);
@@ -188,8 +188,8 @@ int32_t csi_wdt_set_timeout(wdt_handle_t handle, uint32_t value)
         return ERR_WDT(DRV_ERROR_PARAMETER);
     }
 
-    dw_wdt_priv_t *wdt_priv = handle;
-    dw_wdt_reg_t *addr = (dw_wdt_reg_t *)(wdt_priv->base);
+    wj_oip_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_reg_t *addr = (wj_oip_wdt_reg_t *)(wdt_priv->base);
 
     uint32_t config = addr->WDT_CR;
     uint32_t en_stat = 0;   /*origin wdt enable status*/
@@ -202,12 +202,12 @@ int32_t csi_wdt_set_timeout(wdt_handle_t handle, uint32_t value)
     addr->WDT_CR = config;
 
     /*before configuration, must disable wdt first*/
-    dw_wdt_disable(addr);
+    wj_oip_wdt_disable(addr);
     i += i << 4;
     addr->WDT_TORR = i;
 
     if (en_stat == 1) {
-        dw_wdt_enable(addr);
+        wj_oip_wdt_enable(addr);
         csi_wdt_restart(handle);
     }
 
@@ -223,10 +223,10 @@ int32_t csi_wdt_start(wdt_handle_t handle)
 {
     WDT_NULL_PARAM_CHK(handle);
 
-    dw_wdt_priv_t *wdt_priv = handle;
-    dw_wdt_reg_t *addr = (dw_wdt_reg_t *)(wdt_priv->base);
+    wj_oip_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_reg_t *addr = (wj_oip_wdt_reg_t *)(wdt_priv->base);
 
-    dw_wdt_enable(addr);
+    wj_oip_wdt_enable(addr);
     csi_wdt_restart(handle);
     return 0;
 }
@@ -252,10 +252,10 @@ int32_t csi_wdt_restart(wdt_handle_t handle)
 {
     WDT_NULL_PARAM_CHK(handle);
 
-    dw_wdt_priv_t *wdt_priv = handle;
-    dw_wdt_reg_t *addr = (dw_wdt_reg_t *)(wdt_priv->base);
+    wj_oip_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_reg_t *addr = (wj_oip_wdt_reg_t *)(wdt_priv->base);
 
-    addr->WDT_CRR = DW_WDT_CRR_RESET;
+    addr->WDT_CRR = WJ_OIP_WDT_CRR_RESET;
 
     return 0;
 }
@@ -271,8 +271,8 @@ int32_t csi_wdt_read_current_value(wdt_handle_t handle, uint32_t *value)
     WDT_NULL_PARAM_CHK(handle);
     WDT_NULL_PARAM_CHK(value);
 
-    dw_wdt_priv_t *wdt_priv = handle;
-    dw_wdt_reg_t *addr = (dw_wdt_reg_t *)(wdt_priv->base);
+    wj_oip_wdt_priv_t *wdt_priv = handle;
+    wj_oip_wdt_reg_t *addr = (wj_oip_wdt_reg_t *)(wdt_priv->base);
 
     *value = addr->WDT_CCVR;
     return 0;

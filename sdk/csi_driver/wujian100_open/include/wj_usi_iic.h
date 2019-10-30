@@ -9,33 +9,33 @@
  * @version  V1.0
  * @date     02. June 2017
  ******************************************************************************/
-#ifndef _CK_USI_IIC_H_
-#define _CK_USI_IIC_H_
+#ifndef _WJ_USI_IIC_H_
+#define _WJ_USI_IIC_H_
 #include "soc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define CK_USI_I2C_MODE_SLAVE   0x00
-#define CK_USI_I2C_MODE_MATER   0x01
+#define WJ_USI_I2C_MODE_SLAVE   0x00
+#define WJ_USI_I2C_MODE_MATER   0x01
 
-#define CK_USI_I2CM_CTRL_HS_MODE        0x04
+#define WJ_USI_I2CM_CTRL_HS_MODE        0x04
 
-#define CK_USI_I2CM_CTRL_ADDR_MODE      0x1e
-#define CK_USI_I2CM_CTRL_ADDR7_MODE     0x00
-#define CK_USI_I2CM_CTRL_ADDR10_MODE    0x01
+#define WJ_USI_I2CM_CTRL_ADDR_MODE      0x1e
+#define WJ_USI_I2CM_CTRL_ADDR7_MODE     0x00
+#define WJ_USI_I2CM_CTRL_ADDR10_MODE    0x01
 
-#define CK_USI_I2CM_CTRL_SBYTE_EN       0x08
+#define WJ_USI_I2CM_CTRL_SBYTE_EN       0x08
 
-#define CK_USI_I2C_STA_SLAVE_WORK       0x100
-#define CK_USI_I2C_STA_MASTER_WORK      0x1
+#define WJ_USI_I2C_STA_SLAVE_WORK       0x100
+#define WJ_USI_I2C_STA_MASTER_WORK      0x1
 
 typedef enum {
-    CK_IIC_STANDARDSPEED = 100000,
-    CK_IIC_FASTSPEED     = 400000,
-    CK_IIC_HIGHSPEED     = 3400000
-} CKENUM_IIC_SPEED;
+    WJ_IIC_STANDARDSPEED = 100000,
+    WJ_IIC_FASTSPEED     = 400000,
+    WJ_IIC_HIGHSPEED     = 3400000
+} WJENUM_IIC_SPEED;
 
 enum i2c_state_e {
     IIC_STATE_NONE = 0,          /* Send start + (first part of) address. */
@@ -52,4 +52,4 @@ enum i2c_state_e {
 }
 #endif
 
-#endif /* _CK_USI_IIC_H_ */
+#endif /* _WJ_USI_IIC_H_ */

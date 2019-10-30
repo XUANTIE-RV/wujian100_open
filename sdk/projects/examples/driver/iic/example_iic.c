@@ -16,7 +16,7 @@
 #include "soc.h"
 #include "pin.h"
 
-#define  CK_IIC_SLAVE_ADDR         0x50
+#define  WJ_IIC_SLAVE_ADDR         0x50
 #define  EEPROM_PAGE_SIZE          0x20
 #define  EEPROM_SIZE               8192
 #define  EEPROM_SUB_ADDR_START     0x0000
@@ -63,14 +63,14 @@ static int test_iic_eeprom(int32_t iic_idx)
         return -1;
     }
 
-    ret = csi_iic_config(pcsi_iic, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_7BIT, CK_IIC_SLAVE_ADDR);
+    ret = csi_iic_config(pcsi_iic, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_7BIT, WJ_IIC_SLAVE_ADDR);
 
     if (ret < 0) {
         printf("csi_iic_config error\n");
         return -1;
     }
 
-    ret = csi_iic_master_send(pcsi_iic, CK_IIC_SLAVE_ADDR, write_data, sizeof(write_data), xfer_pending);
+    ret = csi_iic_master_send(pcsi_iic, WJ_IIC_SLAVE_ADDR, write_data, sizeof(write_data), xfer_pending);
 
     if (ret < 0) {
         printf("csi_iic_master_send error\n");
@@ -82,7 +82,7 @@ static int test_iic_eeprom(int32_t iic_idx)
     mdelay(5);
 
     cb_transfer_flag = 0;
-    ret = csi_iic_master_send(pcsi_iic, CK_IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
+    ret = csi_iic_master_send(pcsi_iic, WJ_IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
 
     if (ret < 0) {
         printf("csi_iic_master_send error\n");
@@ -92,7 +92,7 @@ static int test_iic_eeprom(int32_t iic_idx)
     while (!cb_transfer_flag);
 
     cb_transfer_flag = 0;
-    ret = csi_iic_master_receive(pcsi_iic, CK_IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
+    ret = csi_iic_master_receive(pcsi_iic, WJ_IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
 
     if (ret < 0) {
         printf("csi_iic_master_receive error\n");
@@ -122,7 +122,7 @@ static int test_iic_eeprom(int32_t iic_idx)
     /* test abort fun */
     memset(read_data + 2, 0x0, EEPROM_PAGE_SIZE);
     cb_transfer_flag = 0;
-    ret = csi_iic_master_send(pcsi_iic, CK_IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
+    ret = csi_iic_master_send(pcsi_iic, WJ_IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
 
     if (ret < 0) {
         printf("csi_iic_master_send error\n");
@@ -132,7 +132,7 @@ static int test_iic_eeprom(int32_t iic_idx)
     while (!cb_transfer_flag);
 
     cb_transfer_flag = 0;
-    ret = csi_iic_master_receive(pcsi_iic, CK_IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
+    ret = csi_iic_master_receive(pcsi_iic, WJ_IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
 
     if (ret < 0) {
         printf("csi_iic_master_receive error\n");

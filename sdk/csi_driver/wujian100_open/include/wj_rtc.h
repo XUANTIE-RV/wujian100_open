@@ -3,13 +3,13 @@
  */
 
 /******************************************************************************
- * @file     ck_rtc.h
+ * @file     wj_rtc.h
  * @brief    header file for rtc driver
  * @version  V1.0
  * @date     02. June 2017
  ******************************************************************************/
-#ifndef __CK_RTC_H
-#define __CK_RTC_H
+#ifndef __WJ_RTC_H
+#define __WJ_RTC_H
 
 #include <stdio.h>
 #include "soc.h"
@@ -32,11 +32,11 @@ typedef struct {
     __IM  uint32_t    RTC_EOI;          /* Offset: 0x018 (R/ )  end of interrupt register */
     __IM  uint32_t    RTC_COMP_VERSION; /* Offset: 0x01c (R/ )  component version register */
     __IOM uint32_t    RTC_DIV;          /* Offset: 0x020 (R/W)  rtc clock divider register */
-} ck_rtc_reg_t;
+} wj_rtc_reg_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CK_RTC_H */
+#endif /* __WJ_RTC_H */
 

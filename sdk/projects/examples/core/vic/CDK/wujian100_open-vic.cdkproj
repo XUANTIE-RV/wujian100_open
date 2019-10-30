@@ -2,139 +2,326 @@
 <Project Name="wujian100_open-vic" Version="1" Language="C">
   <Description/>
   <Dependencies Name="Debug"/>
-  <DebugSessions>
-    <watchExpressions/>
-    <memoryExpressions>;;;</memoryExpressions>
-    <statistics>;;MHZ</statistics>
-  </DebugSessions>
   <VirtualDirectory Name="board">
     <VirtualDirectory Name="wujian100_open_evb">
-      <File Name="../../../../../board/wujian100_open_evb/board_init.c"/>
-      <File Name="../../../../../board/wujian100_open_evb/gcc_csky.ld"/>
+      <File Name="../../../../../board/wujian100_open_evb/board_init.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../board/wujian100_open_evb/gcc_csky.ld">
+        <FileOption/>
+      </File>
       <VirtualDirectory Name="include">
-        <File Name="../../../../../board/wujian100_open_evb/include/pin.h"/>
-        <File Name="../../../../../board/wujian100_open_evb/include/test_driver_config.h"/>
-        <File Name="../../../../../board/wujian100_open_evb/include/test_kernel_config.h"/>
+        <File Name="../../../../../board/wujian100_open_evb/include/pin.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../board/wujian100_open_evb/include/test_driver_config.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../board/wujian100_open_evb/include/test_kernel_config.h">
+          <FileOption/>
+        </File>
       </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="csi_core">
     <VirtualDirectory Name="include">
-      <File Name="../../../../../csi_core/include/core_rv32.h"/>
-      <File Name="../../../../../csi_core/include/csi_core.h"/>
-      <File Name="../../../../../csi_core/include/csi_rv32_gcc.h"/>
+      <File Name="../../../../../csi_core/include/core_rv32.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_core/include/csi_core.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_core/include/csi_rv32_gcc.h">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="csi_driver">
     <VirtualDirectory Name="include">
-      <File Name="../../../../../csi_driver/include/drv_aes.h"/>
-      <File Name="../../../../../csi_driver/include/drv_common.h"/>
-      <File Name="../../../../../csi_driver/include/drv_crc.h"/>
-      <File Name="../../../../../csi_driver/include/drv_dmac.h"/>
-      <File Name="../../../../../csi_driver/include/drv_eflash.h"/>
-      <File Name="../../../../../csi_driver/include/drv_errno.h"/>
-      <File Name="../../../../../csi_driver/include/drv_gpio.h"/>
-      <File Name="../../../../../csi_driver/include/drv_i2s.h"/>
-      <File Name="../../../../../csi_driver/include/drv_iic.h"/>
-      <File Name="../../../../../csi_driver/include/drv_intc.h"/>
-      <File Name="../../../../../csi_driver/include/drv_irq.h"/>
-      <File Name="../../../../../csi_driver/include/drv_pmu.h"/>
-      <File Name="../../../../../csi_driver/include/drv_pwm.h"/>
-      <File Name="../../../../../csi_driver/include/drv_rsa.h"/>
-      <File Name="../../../../../csi_driver/include/drv_rtc.h"/>
-      <File Name="../../../../../csi_driver/include/drv_sha.h"/>
-      <File Name="../../../../../csi_driver/include/drv_spiflash.h"/>
-      <File Name="../../../../../csi_driver/include/drv_spi.h"/>
-      <File Name="../../../../../csi_driver/include/drv_timer.h"/>
-      <File Name="../../../../../csi_driver/include/drv_trng.h"/>
-      <File Name="../../../../../csi_driver/include/drv_usart.h"/>
-      <File Name="../../../../../csi_driver/include/drv_wdt.h"/>
+      <File Name="../../../../../csi_driver/include/drv_aes.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_common.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_crc.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_dmac.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_eflash.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_errno.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_gpio.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_i2s.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_iic.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_intc.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_irq.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_pmu.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_pwm.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_rsa.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_rtc.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_sha.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_spiflash.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_spi.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_timer.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_trng.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_usart.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/include/drv_wdt.h">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
     <VirtualDirectory Name="wujian100_open">
-      <File Name="../../../../../csi_driver/wujian100_open/ck_dmac_v2.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_irq.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_pwm.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_rtc.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_usi.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_usi_iic.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_usi_spi.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_usi_usart.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/ck_usi_wrap.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/devices.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/dw_gpio.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/dw_timer.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/dw_wdt.c"/>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_dmac_v2.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_irq.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_pwm.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_rtc.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_usi.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_usi_iic.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_usi_spi.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_usi_usart.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_usi_wrap.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/devices.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_oip_gpio.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_oip_timer.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/wj_oip_wdt.c">
+        <FileOption/>
+      </File>
       <VirtualDirectory Name="include">
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_dmac_v2.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_pwm.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_rtc.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_usi.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_usi_iic.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_usi_spi.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/ck_usi_usart.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/drv_usi_iic.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/drv_usi_spi.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/drv_usi_usart.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/dw_gpio.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/dw_timer.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/dw_wdt.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/io.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/pinmux.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/pin_name.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/soc.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/sys_freq.h"/>
-        <File Name="../../../../../csi_driver/wujian100_open/include/usi_pin_planning.h"/>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_dmac_v2.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_pwm.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_rtc.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_usi.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_usi_iic.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_usi_spi.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_usi_usart.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/drv_usi_iic.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/drv_usi_spi.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/drv_usi_usart.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_oip_gpio.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_oip_timer.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/wj_oip_wdt.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/io.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/pinmux.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/pin_name.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/soc.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/sys_freq.h">
+          <FileOption/>
+        </File>
+        <File Name="../../../../../csi_driver/wujian100_open/include/usi_pin_planning.h">
+          <FileOption/>
+        </File>
       </VirtualDirectory>
-      <File Name="../../../../../csi_driver/wujian100_open/isr.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/lib.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/novic_irq_tbl.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/pinmux.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/startup.S"/>
-      <File Name="../../../../../csi_driver/wujian100_open/sys_freq.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/system.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/trap_c.c"/>
-      <File Name="../../../../../csi_driver/wujian100_open/vectors.S"/>
+      <File Name="../../../../../csi_driver/wujian100_open/isr.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/lib.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/novic_irq_tbl.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/pinmux.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/startup.S">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/sys_freq.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/system.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/trap_c.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../csi_driver/wujian100_open/vectors.S">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="libs">
     <VirtualDirectory Name="include">
-      <File Name="../../../../../libs/include/errno.h"/>
-      <File Name="../../../../../libs/include/mm.h"/>
-      <File Name="../../../../../libs/include/mm_queue.h"/>
+      <File Name="../../../../../libs/include/errno.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/include/mm.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/include/mm_queue.h">
+        <FileOption/>
+      </File>
       <VirtualDirectory Name="ringbuffer">
-        <File Name="../../../../../libs/include/ringbuffer/ringbuffer.h"/>
+        <File Name="../../../../../libs/include/ringbuffer/ringbuffer.h">
+          <FileOption/>
+        </File>
       </VirtualDirectory>
-      <File Name="../../../../../libs/include/syslog.h"/>
+      <File Name="../../../../../libs/include/syslog.h">
+        <FileOption/>
+      </File>
       <VirtualDirectory Name="sys">
-        <File Name="../../../../../libs/include/sys/_stdint.h"/>
+        <File Name="../../../../../libs/include/sys/_stdint.h">
+          <FileOption/>
+        </File>
       </VirtualDirectory>
-      <File Name="../../../../../libs/include/time.h"/>
-      <File Name="../../../../../libs/include/umm_heap.h"/>
+      <File Name="../../../../../libs/include/time.h">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/include/umm_heap.h">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
     <VirtualDirectory Name="libc">
-      <File Name="../../../../../libs/libc/clock_gettime.c"/>
-      <File Name="../../../../../libs/libc/_init.c"/>
-      <File Name="../../../../../libs/libc/malloc.c"/>
-      <File Name="../../../../../libs/libc/minilibc_port.c"/>
+      <File Name="../../../../../libs/libc/clock_gettime.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/libc/_init.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/libc/malloc.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/libc/minilibc_port.c">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
-    <File Name="../../../../../libs/libnewlib_wrap.a"/>
+    <File Name="../../../../../libs/libnewlib_wrap.a">
+      <FileOption/>
+    </File>
     <VirtualDirectory Name="mm">
-      <File Name="../../../../../libs/mm/dq_addlast.c"/>
-      <File Name="../../../../../libs/mm/dq_rem.c"/>
-      <File Name="../../../../../libs/mm/lib_mallinfo.c"/>
-      <File Name="../../../../../libs/mm/mm_addfreechunk.c"/>
-      <File Name="../../../../../libs/mm/mm_free.c"/>
-      <File Name="../../../../../libs/mm/mm_initialize.c"/>
-      <File Name="../../../../../libs/mm/mm_leak.c"/>
-      <File Name="../../../../../libs/mm/mm_mallinfo.c"/>
-      <File Name="../../../../../libs/mm/mm_malloc.c"/>
-      <File Name="../../../../../libs/mm/mm_size2ndx.c"/>
+      <File Name="../../../../../libs/mm/dq_addlast.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/dq_rem.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/lib_mallinfo.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_addfreechunk.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_free.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_initialize.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_leak.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_mallinfo.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_malloc.c">
+        <FileOption/>
+      </File>
+      <File Name="../../../../../libs/mm/mm_size2ndx.c">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
     <VirtualDirectory Name="ringbuffer">
-      <File Name="../../../../../libs/ringbuffer/ringbuffer.c"/>
+      <File Name="../../../../../libs/ringbuffer/ringbuffer.c">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
     <VirtualDirectory Name="syslog">
-      <File Name="../../../../../libs/syslog/syslog.c"/>
+      <File Name="../../../../../libs/syslog/syslog.c">
+        <FileOption/>
+      </File>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="projects">
@@ -142,9 +329,13 @@
       <VirtualDirectory Name="core">
         <VirtualDirectory Name="vic">
           <VirtualDirectory Name="configs">
-            <File Name="../../../../../projects/examples/core/vic/configs/csi_config.h"/>
+            <File Name="../../../../../projects/examples/core/vic/configs/csi_config.h">
+              <FileOption/>
+            </File>
           </VirtualDirectory>
-          <File Name="../../../../../projects/examples/core/vic/example_vic.c"/>
+          <File Name="../../../../../projects/examples/core/vic/example_vic.c">
+            <FileOption/>
+          </File>
         </VirtualDirectory>
       </VirtualDirectory>
     </VirtualDirectory>
@@ -262,7 +453,7 @@
         <Define/>
         <Undefine/>
         <IncludePath>$(ProjectPath);;$(ProjectPath)/../../../../../projects/examples/core/vic/configs</IncludePath>
-        <OtherFlags></OtherFlags>
+        <OtherFlags/>
         <DebugLevel>gdwarf2</DebugLevel>
       </Asm>
       <Linker>
@@ -314,4 +505,14 @@
       </Flash>
     </BuildConfig>
   </BuildConfigs>
+  <DebugSessions>
+    <watchExpressions/>
+    <memoryExpressions>;;;</memoryExpressions>
+    <statistics>;;MHZ</statistics>
+    <peripheralTabs/>
+    <WatchDisplayFormat/>
+    <LocalDisplayFormat/>
+    <debugLayout/>
+    <memoryTabColSizeExpressions/>
+  </DebugSessions>
 </Project>

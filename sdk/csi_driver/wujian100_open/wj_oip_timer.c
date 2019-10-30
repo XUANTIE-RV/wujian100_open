@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     dw_timer.c
+ * @file     wj_oip_timer.c
  * @brief    CSI Source File for timer Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -13,7 +13,7 @@
 #include <csi_config.h>
 #include <drv_irq.h>
 #include <drv_timer.h>
-#include <dw_timer.h>
+#include <wj_oip_timer.h>
 #include <soc.h>
 #include <csi_core.h>
 
@@ -32,30 +32,30 @@ typedef struct {
     timer_event_cb_t cb_event;
     uint32_t timeout;                  ///< the set time (us)
     uint32_t timeout_flag;
-} dw_timer_priv_t;
+} wj_oip_timer_priv_t;
 
 extern int32_t target_get_timer_count(void);
 extern int32_t target_get_timer(int32_t idx, uint32_t *base, uint32_t *irq, void **handler);
 
-static dw_timer_priv_t timer_instance[CONFIG_TIMER_NUM];
+static wj_oip_timer_priv_t timer_instance[CONFIG_TIMER_NUM];
 /**
   \brief      Make all the timers in the idle state.
   \param[in]  pointer to timer register base
 */
-static void timer_deactive_control(dw_timer_reg_t *addr)
+static void timer_deactive_control(wj_oip_timer_reg_t *addr)
 {
     /* stop the corresponding timer */
-    addr->TxControl &= ~DW_TIMER_TXCONTROL_ENABLE;
+    addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_ENABLE;
     /* Disable interrupt. */
-    addr->TxControl |= DW_TIMER_TXCONTROL_INTMASK;
+    addr->TxControl |= WJ_OIP_TIMER_TXCONTROL_INTMASK;
 }
 
-void dw_timer_irqhandler(int idx)
+void wj_oip_timer_irqhandler(int idx)
 {
-    dw_timer_priv_t *timer_priv = &timer_instance[idx];
+    wj_oip_timer_priv_t *timer_priv = &timer_instance[idx];
     timer_priv->timeout_flag = 1;
 
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
     addr->TxEOI;
 
@@ -77,7 +77,7 @@ static void manage_clock(timer_handle_t handle, uint8_t enable)
 
 static void do_prepare_sleep_action(timer_handle_t handle)
 {
-    dw_timer_priv_t *timer_priv = (dw_timer_priv_t *)handle;
+    wj_oip_timer_priv_t *timer_priv = (wj_oip_timer_priv_t *)handle;
     uint32_t *tbase = (uint32_t *)(timer_priv->base);
     registers_save(timer_priv->timer_regs_saved, tbase, 1);
     registers_save(&timer_priv->timer_regs_saved[1], tbase + 2, 1);
@@ -85,7 +85,7 @@ static void do_prepare_sleep_action(timer_handle_t handle)
 
 static void do_wakeup_sleep_action(timer_handle_t handle)
 {
-    dw_timer_priv_t *timer_priv = (dw_timer_priv_t *)handle;
+    wj_oip_timer_priv_t *timer_priv = (wj_oip_timer_priv_t *)handle;
     uint32_t *tbase = (uint32_t *)(timer_priv->base);
     registers_restore(tbase, timer_priv->timer_regs_saved, 1);
     registers_restore(tbase + 2, &timer_priv->timer_regs_saved[1], 1);
@@ -114,13 +114,13 @@ timer_handle_t csi_timer_initialize(int32_t idx, timer_event_cb_t cb_event)
         return NULL;
     }
 
-    dw_timer_priv_t *timer_priv = &timer_instance[idx];
+    wj_oip_timer_priv_t *timer_priv = &timer_instance[idx];
     timer_priv->base = base;
     timer_priv->irq  = irq;
     timer_priv->idx = idx;
 
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
-    timer_priv->timeout = DW_TIMER_INIT_DEFAULT_VALUE;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
+    timer_priv->timeout = WJ_OIP_TIMER_INIT_DEFAULT_VALUE;
 
 #ifdef CONFIG_LPM
     csi_timer_power_control(timer_priv, DRV_POWER_FULL);
@@ -146,8 +146,8 @@ int32_t csi_timer_uninitialize(timer_handle_t handle)
 {
     TIMER_NULL_PARAM_CHK(handle);
 
-    dw_timer_priv_t *timer_priv = (dw_timer_priv_t *)handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = (wj_oip_timer_priv_t *)handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
     timer_deactive_control(addr);
     timer_priv->cb_event = NULL;
@@ -187,23 +187,23 @@ int32_t csi_timer_config(timer_handle_t handle, timer_mode_e mode)
 {
     TIMER_NULL_PARAM_CHK(handle);
 
-    dw_timer_priv_t *timer_priv = handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
     switch (mode) {
         case TIMER_MODE_FREE_RUNNING:
-            addr->TxControl &= ~DW_TIMER_TXCONTROL_MODE;
+            addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_MODE;
             break;
 
         case TIMER_MODE_RELOAD:
-            addr->TxControl |= DW_TIMER_TXCONTROL_MODE;
+            addr->TxControl |= WJ_OIP_TIMER_TXCONTROL_MODE;
             break;
 
         default:
             return ERR_TIMER(DRV_ERROR_PARAMETER);
     }
 
-    addr->TxControl |= (DW_TIMER_TXCONTROL_TRIGGER);
+    addr->TxControl |= (WJ_OIP_TIMER_TXCONTROL_TRIGGER);
 
     return 0;
 }
@@ -218,7 +218,7 @@ int32_t csi_timer_set_timeout(timer_handle_t handle, uint32_t timeout)
 {
     TIMER_NULL_PARAM_CHK(handle);
 
-    dw_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_priv_t *timer_priv = handle;
     timer_priv->timeout = timeout;
     return 0;
 }
@@ -233,7 +233,7 @@ int32_t csi_timer_start(timer_handle_t handle)
 {
     TIMER_NULL_PARAM_CHK(handle);
 
-    dw_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_priv_t *timer_priv = handle;
 
     timer_priv->timeout_flag = 0;
 
@@ -250,7 +250,7 @@ int32_t csi_timer_start(timer_handle_t handle)
         load = (uint32_t)(((uint64_t)(timer_priv->timeout) * drv_get_timer_freq(timer_priv->idx)) / 1000000);
     }
 
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
     if (timer_priv->timeout == 0) {
         addr->TxLoadCount = 0xffffffff;                           /* load time(us) */
@@ -262,17 +262,17 @@ int32_t csi_timer_start(timer_handle_t handle)
         }
     }
 
-    addr->TxControl &= ~DW_TIMER_TXCONTROL_ENABLE;      /* disable the timer */
-    addr->TxControl |= DW_TIMER_TXCONTROL_ENABLE;       /* enable the corresponding timer */
-    addr->TxControl &= ~DW_TIMER_TXCONTROL_INTMASK;     /* enable interrupt */
+    addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_ENABLE;      /* disable the timer */
+    addr->TxControl |= WJ_OIP_TIMER_TXCONTROL_ENABLE;       /* enable the corresponding timer */
+    addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_INTMASK;     /* enable interrupt */
 
     /* avoid timer bug on yunvoice soc */
 #ifdef CONFIG_CHIP_YUNVOICE
 
     if (addr->TxCurrentValue > addr->TxLoadCount) {
-        addr->TxControl &= ~DW_TIMER_TXCONTROL_ENABLE;      /* disable the timer */
-        addr->TxControl |= DW_TIMER_TXCONTROL_ENABLE;       /* enable the corresponding timer */
-        addr->TxControl &= ~DW_TIMER_TXCONTROL_INTMASK;     /* enable interrupt */
+        addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_ENABLE;      /* disable the timer */
+        addr->TxControl |= WJ_OIP_TIMER_TXCONTROL_ENABLE;       /* enable the corresponding timer */
+        addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_INTMASK;     /* enable interrupt */
     }
 
 #endif
@@ -289,11 +289,11 @@ int32_t csi_timer_stop(timer_handle_t handle)
 {
     TIMER_NULL_PARAM_CHK(handle);
 
-    dw_timer_priv_t *timer_priv = handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
-    addr->TxControl |= DW_TIMER_TXCONTROL_INTMASK;      /* enable interrupt */
-    addr->TxControl &= ~DW_TIMER_TXCONTROL_ENABLE;      /* disable the timer */
+    addr->TxControl |= WJ_OIP_TIMER_TXCONTROL_INTMASK;      /* enable interrupt */
+    addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_ENABLE;      /* disable the timer */
 
     return 0;
 }
@@ -319,11 +319,11 @@ int32_t csi_timer_resume(timer_handle_t handle)
 {
     TIMER_NULL_PARAM_CHK(handle);
 
-    dw_timer_priv_t *timer_priv = handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
-    addr->TxControl &= ~DW_TIMER_TXCONTROL_ENABLE;      /* stop the corresponding timer */
-    addr->TxControl &= DW_TIMER_TXCONTROL_ENABLE;       /* restart the corresponding timer */
+    addr->TxControl &= ~WJ_OIP_TIMER_TXCONTROL_ENABLE;      /* stop the corresponding timer */
+    addr->TxControl &= WJ_OIP_TIMER_TXCONTROL_ENABLE;       /* restart the corresponding timer */
 
     return 0;
 }
@@ -339,8 +339,8 @@ int32_t csi_timer_get_current_value(timer_handle_t handle, uint32_t *value)
     TIMER_NULL_PARAM_CHK(handle);
     TIMER_NULL_PARAM_CHK(value);
 
-    dw_timer_priv_t *timer_priv = handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
     *value = addr->TxCurrentValue;
     return 0;
@@ -359,10 +359,10 @@ timer_status_t csi_timer_get_status(timer_handle_t handle)
         return timer_status;
     }
 
-    dw_timer_priv_t *timer_priv = handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
-    if (addr->TxControl & DW_TIMER_TXCONTROL_ENABLE) {
+    if (addr->TxControl & WJ_OIP_TIMER_TXCONTROL_ENABLE) {
         timer_status.active = 1;
     }
 
@@ -384,8 +384,8 @@ int32_t csi_timer_get_load_value(timer_handle_t handle, uint32_t *value)
     TIMER_NULL_PARAM_CHK(handle);
     TIMER_NULL_PARAM_CHK(value);
 
-    dw_timer_priv_t *timer_priv = handle;
-    dw_timer_reg_t *addr = (dw_timer_reg_t *)(timer_priv->base);
+    wj_oip_timer_priv_t *timer_priv = handle;
+    wj_oip_timer_reg_t *addr = (wj_oip_timer_reg_t *)(timer_priv->base);
 
     *value = addr->TxLoadCount;
     return 0;

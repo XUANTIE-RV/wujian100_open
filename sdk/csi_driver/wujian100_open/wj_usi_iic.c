@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     ck_usi_iic.c
+ * @file     wj_usi_iic.c
  * @brief    CSI Source File for USI IIC Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -13,8 +13,8 @@
 #include <string.h>
 #include <drv_irq.h>
 #include <drv_usi_iic.h>
-#include <ck_usi_iic.h>
-#include <ck_usi.h>
+#include <wj_usi_iic.h>
+#include <wj_usi.h>
 #include <soc.h>
 
 #define ERR_IIC(errno) (CSI_DRV_ERRNO_IIC_BASE | errno)
@@ -34,20 +34,20 @@ typedef struct  {
     volatile uint32_t tx_cnt;
     uint32_t status;             ///< status of iic transfer
     int32_t idx;
-} ck_usi_iic_priv_t;
+} wj_usi_iic_priv_t;
 
 extern int32_t target_usi_iic_init(int32_t idx, uint32_t *base, uint32_t *irq, void **handler);
 
-static ck_usi_iic_priv_t iic_instance[CONFIG_USI_NUM];
+static wj_usi_iic_priv_t iic_instance[CONFIG_USI_NUM];
 
 static const iic_capabilities_t iic_capabilities = {
     .address_10_bit = 0,  /* supports 10-bit addressing */
 };
 
-static inline void ck_iic_set_transfer_speed(ck_usi_reg_t *addr, CKENUM_IIC_SPEED speed, int32_t idx)
+static inline void wj_iic_set_transfer_speed(wj_usi_reg_t *addr, WJENUM_IIC_SPEED speed, int32_t idx)
 {
-    if (speed == CK_IIC_FASTSPEED || speed == CK_IIC_STANDARDSPEED) {
-        addr->USI_I2CM_CTRL &= ~CK_USI_I2CM_CTRL_HS_MODE;
+    if (speed == WJ_IIC_FASTSPEED || speed == WJ_IIC_STANDARDSPEED) {
+        addr->USI_I2CM_CTRL &= ~WJ_USI_I2CM_CTRL_HS_MODE;
         /* Fast Speed 400kHz set duty 50% */
 #if defined(CONFIG_CHIP_PANGU)
         addr->USI_CLK_DIV0  = (drv_get_usi_freq(idx) / speed - 2) / 2;
@@ -56,25 +56,25 @@ static inline void ck_iic_set_transfer_speed(ck_usi_reg_t *addr, CKENUM_IIC_SPEE
 #endif
         addr->USI_CLK_DIV1  = addr->USI_CLK_DIV0;
     } else {
-        addr->USI_I2CM_CTRL |= CK_USI_I2CM_CTRL_HS_MODE;
+        addr->USI_I2CM_CTRL |= WJ_USI_I2CM_CTRL_HS_MODE;
     }
 }
 
-static inline void ck_iic_set_target_address(ck_usi_reg_t *addr, uint16_t address)
+static inline void wj_iic_set_target_address(wj_usi_reg_t *addr, uint16_t address)
 {
     uint16_t temp = addr->USI_I2C_ADDR;
     temp &= 0xfc00;
     temp |= address;
     addr->USI_I2C_ADDR = temp;
 }
-static inline void ck_iic_set_addr_mode(ck_usi_reg_t *addr, iic_address_mode_e addr_mode)
+static inline void wj_iic_set_addr_mode(wj_usi_reg_t *addr, iic_address_mode_e addr_mode)
 {
     if (addr_mode == IIC_ADDRESS_7BIT) {
-        addr->USI_I2CM_CTRL &= CK_USI_I2CM_CTRL_ADDR_MODE;
-        addr->USI_I2CM_CTRL |= CK_USI_I2CM_CTRL_ADDR7_MODE;
+        addr->USI_I2CM_CTRL &= WJ_USI_I2CM_CTRL_ADDR_MODE;
+        addr->USI_I2CM_CTRL |= WJ_USI_I2CM_CTRL_ADDR7_MODE;
     } else {
-        addr->USI_I2CM_CTRL &= CK_USI_I2CM_CTRL_ADDR_MODE;
-        addr->USI_I2CM_CTRL |= CK_USI_I2CM_CTRL_ADDR10_MODE;
+        addr->USI_I2CM_CTRL &= WJ_USI_I2CM_CTRL_ADDR_MODE;
+        addr->USI_I2CM_CTRL |= WJ_USI_I2CM_CTRL_ADDR10_MODE;
     }
 
     addr->USI_I2CM_CTRL |= (1 << 1);
@@ -84,9 +84,9 @@ static inline void ck_iic_set_addr_mode(ck_usi_reg_t *addr, iic_address_mode_e a
   \brief       interrupt service function for transmit FIFO empty interrupt.
   \param[in]   iic_priv pointer to iic private.
 */
-static void ck_iic_intr_tx_empty(int32_t idx, ck_usi_iic_priv_t *iic_priv, uint32_t intr_stat)
+static void wj_iic_intr_tx_empty(int32_t idx, wj_usi_iic_priv_t *iic_priv, uint32_t intr_stat)
 {
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
     uint8_t emptyfifo = 0;
 
     if (intr_stat & USI_INT_TX_EMPTY) {
@@ -133,9 +133,9 @@ static void ck_iic_intr_tx_empty(int32_t idx, ck_usi_iic_priv_t *iic_priv, uint3
   \brief       interrupt service function for receive FIFO full interrupt .
   \param[in]   iic_priv pointer to iic private.
 */
-static void ck_iic_intr_rx_full(int32_t idx, ck_usi_iic_priv_t *iic_priv, uint32_t intr_stat)
+static void wj_iic_intr_rx_full(int32_t idx, wj_usi_iic_priv_t *iic_priv, uint32_t intr_stat)
 {
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     if (intr_stat & USI_INT_RX_THOLD) {
         addr->USI_INTR_CLR = USI_INT_RX_THOLD;
@@ -160,7 +160,7 @@ static void ck_iic_intr_rx_full(int32_t idx, ck_usi_iic_priv_t *iic_priv, uint32
             iic_priv->rx_clk--;
         }
 
-        ck_usi_set_rxfifo_th(addr, rxfifo);
+        wj_usi_set_rxfifo_th(addr, rxfifo);
 
         if (rxfifo == 0) {
             addr->USI_INTR_EN |= USI_INT_I2C_STOP;
@@ -192,10 +192,10 @@ static void ck_iic_intr_rx_full(int32_t idx, ck_usi_iic_priv_t *iic_priv, uint32
     }
 
 }
-void ck_usi_i2c_irqhandler(int32_t idx)
+void wj_usi_i2c_irqhandler(int32_t idx)
 {
-    ck_usi_iic_priv_t *iic_priv = &iic_instance[idx];
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_iic_priv_t *iic_priv = &iic_instance[idx];
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     uint32_t intr_state = addr->USI_INTR_STA & 0x3ffff;
 
@@ -219,14 +219,14 @@ void ck_usi_i2c_irqhandler(int32_t idx)
     switch (iic_priv->status) {
         /* send data to slave */
         case IIC_STATE_DATASEND: {
-            ck_iic_intr_tx_empty(idx, iic_priv, intr_state);
+            wj_iic_intr_tx_empty(idx, iic_priv, intr_state);
             addr->USI_INTR_CLR = intr_state;
             break;
         }
 
         /* wait for data from slave */
         case IIC_STATE_WFDATA: {
-            ck_iic_intr_rx_full(idx, iic_priv, intr_state);
+            wj_iic_intr_rx_full(idx, iic_priv, intr_state);
             break;
         }
 
@@ -267,7 +267,7 @@ iic_handle_t drv_usi_iic_initialize(int32_t idx, iic_event_cb_t cb_event)
         return NULL;
     }
 
-    ck_usi_iic_priv_t *iic_priv = &iic_instance[idx];
+    wj_usi_iic_priv_t *iic_priv = &iic_instance[idx];
     iic_priv->base = base;
     iic_priv->irq  = irq;
     iic_priv->idx  = idx;
@@ -281,7 +281,7 @@ iic_handle_t drv_usi_iic_initialize(int32_t idx, iic_event_cb_t cb_event)
     iic_priv->tx_cnt = 0;
     iic_priv->status = 0;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     /* mask all interrupts */
     addr->USI_MODE_SEL = USI_MODE_I2C; /* select iic mode */
@@ -302,8 +302,8 @@ int32_t drv_usi_iic_uninitialize(iic_handle_t handle)
     IIC_NULL_PARAM_CHK(handle);
 
     /* First clear ACTIVITY, then Disable IIC */
-    ck_usi_iic_priv_t *iic_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     addr->USI_INTR_EN = 0;      /* disable all interrupts */
     addr->USI_EN = 0x0;         /* usi module disbale */
@@ -404,15 +404,15 @@ int32_t drv_usi_iic_config_mode(iic_handle_t handle, iic_mode_e mode)
         return 0;
     }
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(((ck_usi_iic_priv_t *)handle)->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(((wj_usi_iic_priv_t *)handle)->base);
 
     switch (mode) {
         case IIC_MODE_MASTER:
-            addr->USI_I2C_MODE = CK_USI_I2C_MODE_MATER;   /* I2CM mode*/
+            addr->USI_I2C_MODE = WJ_USI_I2C_MODE_MATER;   /* I2CM mode*/
             break;
 
         case IIC_MODE_SLAVE:
-            addr->USI_I2C_MODE = CK_USI_I2C_MODE_SLAVE;   /* I2CS mode*/
+            addr->USI_I2C_MODE = WJ_USI_I2C_MODE_SLAVE;   /* I2CS mode*/
             break;
 
         default:
@@ -436,16 +436,16 @@ int32_t drv_usi_iic_config_speed(iic_handle_t handle, iic_speed_e speed)
         return 0;
     }
 
-    ck_usi_iic_priv_t *iic_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(((ck_usi_iic_priv_t *)handle)->base);
+    wj_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(((wj_usi_iic_priv_t *)handle)->base);
 
     switch (speed) {
         case IIC_BUS_SPEED_STANDARD:
-            ck_iic_set_transfer_speed(addr, CK_IIC_STANDARDSPEED, iic_priv->idx);
+            wj_iic_set_transfer_speed(addr, WJ_IIC_STANDARDSPEED, iic_priv->idx);
             break;
 
         case IIC_BUS_SPEED_FAST:
-            ck_iic_set_transfer_speed(addr, CK_IIC_FASTSPEED, iic_priv->idx);
+            wj_iic_set_transfer_speed(addr, WJ_IIC_FASTSPEED, iic_priv->idx);
             break;
 
         case IIC_BUS_SPEED_FAST_PLUS:
@@ -476,12 +476,12 @@ int32_t drv_usi_iic_config_addr_mode(iic_handle_t handle, iic_address_mode_e add
         return 0;
     }
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(((ck_usi_iic_priv_t *)handle)->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(((wj_usi_iic_priv_t *)handle)->base);
 
     switch (addr_mode) {
         case IIC_ADDRESS_10BIT:
         case IIC_ADDRESS_7BIT:
-            ck_iic_set_addr_mode(addr, addr_mode);
+            wj_iic_set_addr_mode(addr, addr_mode);
             break;
 
         default:
@@ -505,9 +505,9 @@ int32_t drv_usi_iic_config_slave_addr(iic_handle_t handle, int32_t slave_addr)
         return 0;
     }
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(((ck_usi_iic_priv_t *)handle)->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(((wj_usi_iic_priv_t *)handle)->base);
 
-    ck_iic_set_target_address(addr, slave_addr);
+    wj_iic_set_target_address(addr, slave_addr);
     return 0;
 }
 
@@ -531,8 +531,8 @@ int32_t drv_usi_iic_master_send(iic_handle_t handle, uint32_t devaddr, const voi
         return ERR_IIC(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_iic_priv_t *iic_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     int ret = drv_usi_iic_config_slave_addr(handle, devaddr);
 
@@ -603,7 +603,7 @@ int32_t drv_usi_iic_master_receive(iic_handle_t handle, uint32_t devaddr, void *
         return ERR_IIC(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_iic_priv_t *iic_priv = handle;
     int ret = drv_usi_iic_config_slave_addr(handle, devaddr);
 
     if (ret < 0) {
@@ -616,11 +616,11 @@ int32_t drv_usi_iic_master_receive(iic_handle_t handle, uint32_t devaddr, void *
     iic_priv->rx_clk          = num;
     iic_priv->status          = IIC_STATE_WFDATA;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
     addr->USI_EN = 0;
     /* set usi fifo rx threshold */
 
-    ck_usi_set_rxfifo_th(addr, 1);
+    wj_usi_set_rxfifo_th(addr, 1);
     addr->USI_I2CM_CTRL &= ~(1 << 1);
     /* open and set corresponding interrupts */
     addr->USI_INTR_UNMASK = USI_INT_I2C_STOP | USI_INT_RX_THOLD;
@@ -691,8 +691,8 @@ int32_t drv_usi_iic_abort_transfer(iic_handle_t handle)
 {
     IIC_NULL_PARAM_CHK(handle);
 
-    ck_usi_iic_priv_t *iic_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     addr->USI_EN              = 0;  /* disable usi module */
     iic_priv->rx_cnt          = 0;
@@ -716,8 +716,8 @@ iic_status_t drv_usi_iic_get_status(iic_handle_t handle)
         return iic_status;
     }
 
-    ck_usi_iic_priv_t *iic_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(iic_priv->base);
+    wj_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(iic_priv->base);
 
     if (iic_priv->status == IIC_STATE_WFDATA) {
         iic_status.direction = 1;
@@ -728,7 +728,7 @@ iic_status_t drv_usi_iic_get_status(iic_handle_t handle)
     if ((addr->USI_I2C_MODE & 0x1) == 0x1) {
         iic_status.mode = 1;        /* master mode */
 
-        if (addr->USI_I2C_STA & CK_USI_I2C_STA_MASTER_WORK) {
+        if (addr->USI_I2C_STA & WJ_USI_I2C_STA_MASTER_WORK) {
             iic_status.busy = 1;    /* iic master is active */
         } else {
             iic_status.busy = 0;    /* iic master is idle */
@@ -736,7 +736,7 @@ iic_status_t drv_usi_iic_get_status(iic_handle_t handle)
     } else {
         iic_status.mode = 0;
 
-        if (addr->USI_I2C_STA & CK_USI_I2C_STA_SLAVE_WORK) {
+        if (addr->USI_I2C_STA & WJ_USI_I2C_STA_SLAVE_WORK) {
             iic_status.busy = 1;    /* iic slave is active */
         } else {
             iic_status.busy = 0;    /* iic slave is idle */
@@ -762,7 +762,7 @@ uint32_t drv_usi_iic_get_data_count(iic_handle_t handle)
 {
     IIC_NULL_PARAM_CHK(handle);
     uint32_t cnt = 0;
-    ck_usi_iic_priv_t *iic_priv = handle;
+    wj_usi_iic_priv_t *iic_priv = handle;
 
     if ((iic_priv->status == IIC_STATE_WFDATA) || (iic_priv->status == IIC_STATE_RECV_DONE)) {
         cnt = iic_priv->rx_cnt;

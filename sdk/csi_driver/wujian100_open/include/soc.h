@@ -6,7 +6,7 @@
 /**************************************************************************//**
  * @file     soc.h
  * @brief    CSI Core Peripheral Access Layer Header File for
- *           CSKYSOC Device Series
+ *           WJSOC Device Series
  * @version  V1.0
  * @date     02. June 2017
  ******************************************************************************/
@@ -89,59 +89,59 @@ IRQn_Type;
 /* ================================================================================ */
 /* --------------------------  CPU FPGA memory map  ------------------------------- */
 
-#define CSKY_PMU_BASE               (0x60030000UL)
-#define CSKY_DMAC0_BASE             (0x40000000UL)
-#define CSKY_WDT_BASE               (0x50008000UL)
-#define CSKY_PWM_BASE               (0x5001C000UL)
-#define CSKY_USI0_BASE              (0x50028000UL)
-#define CSKY_USI1_BASE              (0x60028000UL)
-#define CSKY_USI2_BASE              (0x50029000UL)
-#define CSKY_GPIO0_BASE              (0x60018000UL)
-#define CSKY_RTC0_BASE               (0x60004000UL)
-#define CSKY_TIMER0_BASE            (0x50000000UL)
-#define CSKY_TIMER1_BASE            (0x50000014UL)
-#define CSKY_TIMER2_BASE            (0x60000000UL)
-#define CSKY_TIMER3_BASE            (0x60000014UL)
-#define CSKY_TIMER4_BASE            (0x50000400UL)
-#define CSKY_TIMER5_BASE            (0x50000414UL)
-#define CSKY_TIMER6_BASE            (0x60000400UL)
-#define CSKY_TIMER7_BASE            (0x60000414UL)
-#define CSKY_TIMER8_BASE            (0x50000800UL)
-#define CSKY_TIMER9_BASE            (0x50000814UL)
-#define CSKY_TIMER10_BASE            (0x60000800UL)
-#define CSKY_TIMER11_BASE            (0x60000814UL)
-#define CSKY_TIMER12_BASE            (0x50000c00UL)
-#define CSKY_TIMER13_BASE            (0x50000c14UL)
-#define CSKY_TIMER14_BASE            (0x60000c00UL)
-#define CSKY_TIMER15_BASE            (0x60000c14UL)
+#define WJ_PMU_BASE               (0x60030000UL)
+#define WJ_DMAC0_BASE             (0x40000000UL)
+#define WJ_WDT_BASE               (0x50008000UL)
+#define WJ_PWM_BASE               (0x5001C000UL)
+#define WJ_USI0_BASE              (0x50028000UL)
+#define WJ_USI1_BASE              (0x60028000UL)
+#define WJ_USI2_BASE              (0x50029000UL)
+#define WJ_GPIO0_BASE              (0x60018000UL)
+#define WJ_RTC0_BASE               (0x60004000UL)
+#define WJ_TIMER0_BASE            (0x50000000UL)
+#define WJ_TIMER1_BASE            (0x50000014UL)
+#define WJ_TIMER2_BASE            (0x60000000UL)
+#define WJ_TIMER3_BASE            (0x60000014UL)
+#define WJ_TIMER4_BASE            (0x50000400UL)
+#define WJ_TIMER5_BASE            (0x50000414UL)
+#define WJ_TIMER6_BASE            (0x60000400UL)
+#define WJ_TIMER7_BASE            (0x60000414UL)
+#define WJ_TIMER8_BASE            (0x50000800UL)
+#define WJ_TIMER9_BASE            (0x50000814UL)
+#define WJ_TIMER10_BASE            (0x60000800UL)
+#define WJ_TIMER11_BASE            (0x60000814UL)
+#define WJ_TIMER12_BASE            (0x50000c00UL)
+#define WJ_TIMER13_BASE            (0x50000c14UL)
+#define WJ_TIMER14_BASE            (0x60000c00UL)
+#define WJ_TIMER15_BASE            (0x60000c14UL)
 
 typedef enum {
-    CKENUM_DMA_UART0_RX,
-    CKENUM_DMA_UART0_TX,
-    CKENUM_DMA_UART1_RX,
-    CKENUM_DMA_UART1_TX,
-    CKENUM_DMA_ADC_RX,
-    CKENUM_DMA_ADC_TX,
-    CKENUM_DMA_SPI1_RX,
-    CKENUM_DMA_SPI1_TX,
-    CKENUM_DMA_SPI0_RX,
-    CKENUM_DMA_SPI0_TX,
-    CKENUM_DMA_IIC_RX,
-    CKENUM_DMA_IIC_TX,
-    CKENUM_DMA_IIC1_RX,
-    CKENUM_DMA_IIC1_TX,
-    CKENUM_DMA_IIS_RX,
-    CKENUM_DMA_IIS_TX,
-    CKENUM_DMA_MEMORY
-} ckenum_dma_device_e;
+    WJENUM_DMA_UART0_RX,
+    WJENUM_DMA_UART0_TX,
+    WJENUM_DMA_UART1_RX,
+    WJENUM_DMA_UART1_TX,
+    WJENUM_DMA_ADC_RX,
+    WJENUM_DMA_ADC_TX,
+    WJENUM_DMA_SPI1_RX,
+    WJENUM_DMA_SPI1_TX,
+    WJENUM_DMA_SPI0_RX,
+    WJENUM_DMA_SPI0_TX,
+    WJENUM_DMA_IIC_RX,
+    WJENUM_DMA_IIC_TX,
+    WJENUM_DMA_IIC1_RX,
+    WJENUM_DMA_IIC1_TX,
+    WJENUM_DMA_IIS_RX,
+    WJENUM_DMA_IIS_TX,
+    WJENUM_DMA_MEMORY
+} wjenum_dma_device_e;
 
 /* ================================================================================ */
 /* ================             Peripheral declaration             ================ */
 /* ================================================================================ */
-#define CSKY_UART                  ((   CSKY_UART_TypeDef *)    CSKY_UART_BASE)
+#define WJ_UART                  ((   WJ_UART_TypeDef *)    WJ_UART_BASE)
 
 #define SOC_LPM_RESUME_ADDR        (0x1003f7f0UL)
-#define CONFIG_CK_DMAC
+#define CONFIG_WJ_DMAC
 
 #ifdef __cplusplus
 }

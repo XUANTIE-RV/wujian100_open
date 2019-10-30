@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     ck_rtc.c
+ * @file     wj_rtc.c
  * @brief    CSI Source File for RTC Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -13,7 +13,7 @@
 #include <csi_config.h>
 #include <stdbool.h>
 #include <string.h>
-#include <ck_rtc.h>
+#include <wj_rtc.h>
 #include <csi_core.h>
 #include <drv_irq.h>
 #include <drv_rtc.h>
@@ -32,13 +32,13 @@ typedef struct {
     uint32_t irq;
     rtc_event_cb_t cb_event;
     struct tm rtc_base;
-} ck_rtc_priv_t;
+} wj_rtc_priv_t;
 
 extern void mdelay(uint32_t ms);
 extern int32_t target_get_rtc_count(void);
 extern int32_t target_get_rtc(int32_t idx, uint32_t *base, uint32_t *irq, void **handler);
 
-static ck_rtc_priv_t rtc_instance[CONFIG_RTC_NUM];
+static wj_rtc_priv_t rtc_instance[CONFIG_RTC_NUM];
 static uint8_t leap_year[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static uint8_t noleap_year[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static const uint16_t g_noleap_daysbeforemonth[13] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
@@ -54,7 +54,7 @@ static inline int clock_isleapyear(int year)
     return (year % 400) ? ((year % 100) ? ((year % 4) ? 0 : 1) : 0) : 1;
 }
 
-static inline int32_t ck_rtc_enable(ck_rtc_reg_t *addr)
+static inline int32_t wj_rtc_enable(wj_rtc_reg_t *addr)
 {
     uint32_t value;
 
@@ -64,7 +64,7 @@ static inline int32_t ck_rtc_enable(ck_rtc_reg_t *addr)
     return 0;
 }
 
-static inline int32_t ck_rtc_disable(ck_rtc_reg_t *addr)
+static inline int32_t wj_rtc_disable(wj_rtc_reg_t *addr)
 {
     uint32_t value;
 
@@ -74,7 +74,7 @@ static inline int32_t ck_rtc_disable(ck_rtc_reg_t *addr)
     return 0;
 }
 
-static int ck_rtc_settime(ck_rtc_reg_t *addr, uint32_t settime)
+static int wj_rtc_settime(wj_rtc_reg_t *addr, uint32_t settime)
 {
 #if defined(CONFIG_CHIP_CH2201) || defined(CONFIG_CHIP_PANGU) || defined(CONFIG_CHIP_DANICA) || defined(CONFIG_CHIP_CH6101)
     uint32_t last_value = addr->RTC_CCVR;
@@ -115,7 +115,7 @@ static int ck_rtc_settime(ck_rtc_reg_t *addr, uint32_t settime)
     return 0;
 }
 
-static uint64_t ck_rtc_readtime(ck_rtc_reg_t *addr)
+static uint64_t wj_rtc_readtime(wj_rtc_reg_t *addr)
 {
     uint64_t time;
     uint64_t load;
@@ -146,7 +146,7 @@ static uint64_t ck_rtc_readtime(ck_rtc_reg_t *addr)
     return time;
 }
 
-static int ck_check_tm_ok(struct tm *rtctime)
+static int wj_check_tm_ok(struct tm *rtctime)
 {
     int32_t leap = 1;
 
@@ -234,7 +234,7 @@ time_t mktime(struct tm *tp)
      * month, and date
      */
 
-    ret = ck_check_tm_ok(tp);
+    ret = wj_check_tm_ok(tp);
 
     if (ret < 0) {
         return -1;
@@ -397,7 +397,7 @@ struct tm *gmtime_r(const time_t *timer, struct tm *result)
     result->tm_sec   = (int)sec;
     return result;
 }
-static int ck_rtc_setmarchtime(ck_rtc_reg_t *addr, int64_t settime)
+static int wj_rtc_setmarchtime(wj_rtc_reg_t *addr, int64_t settime)
 {
     int64_t time = settime;
 
@@ -440,7 +440,7 @@ static int ck_rtc_setmarchtime(ck_rtc_reg_t *addr, int64_t settime)
     return 0;
 }
 
-static int32_t ck_rtc_int_enable(ck_rtc_reg_t *addr)
+static int32_t wj_rtc_int_enable(wj_rtc_reg_t *addr)
 {
     uint32_t timecount = 0;
 #ifdef CONFIG_CHIP_CH2201
@@ -477,19 +477,19 @@ static int32_t ck_rtc_int_enable(ck_rtc_reg_t *addr)
     return 0;
 }
 
-static int32_t ck_rtc_int_disable(ck_rtc_reg_t *addr)
+static int32_t wj_rtc_int_disable(wj_rtc_reg_t *addr)
 {
     uint32_t value = addr->RTC_CCR;
     value &= ~(1 << 0);
     addr->RTC_CCR = value;
-    ck_rtc_setmarchtime(addr, ck_rtc_readtime(addr));
+    wj_rtc_setmarchtime(addr, wj_rtc_readtime(addr));
     return 0;
 }
 
-void ck_rtc_irqhandler(int32_t idx)
+void wj_rtc_irqhandler(int32_t idx)
 {
-    ck_rtc_priv_t *rtc_priv = &rtc_instance[idx];
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = &rtc_instance[idx];
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
     addr->RTC_EOI;
 
@@ -511,14 +511,14 @@ static void manage_clock(rtc_handle_t handle, uint8_t enable)
 
 static void do_prepare_sleep_action(rtc_handle_t handle)
 {
-    ck_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_priv_t *rtc_priv = handle;
     uint32_t *rbase = (uint32_t *)(rtc_priv->base);
     registers_save(rtc_priv->rtc_regs_saved, rbase + 1, 3);
 }
 
 static void do_wakeup_sleep_action(rtc_handle_t handle)
 {
-    ck_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_priv_t *rtc_priv = handle;
     uint32_t *rbase = (uint32_t *)(rtc_priv->base);
     registers_restore(rbase + 1, rtc_priv->rtc_regs_saved, 3);
 }
@@ -547,7 +547,7 @@ rtc_handle_t csi_rtc_initialize(int32_t idx, rtc_event_cb_t cb_event)
         return NULL;
     }
 
-    ck_rtc_priv_t *rtc_priv;
+    wj_rtc_priv_t *rtc_priv;
 
     rtc_priv = &rtc_instance[idx];
     rtc_priv->base = base;
@@ -557,7 +557,7 @@ rtc_handle_t csi_rtc_initialize(int32_t idx, rtc_event_cb_t cb_event)
     csi_rtc_power_control(rtc_priv, DRV_POWER_FULL);
 #endif
 
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
     rtc_priv->cb_event = cb_event;
     addr->RTC_CCR = 0;
@@ -579,7 +579,7 @@ int32_t csi_rtc_uninitialize(rtc_handle_t handle)
 {
     RTC_NULL_PARAM_CHK(handle);
 
-    ck_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_priv_t *rtc_priv = handle;
 
     rtc_priv->cb_event = NULL;
     drv_irq_disable(rtc_priv->irq);
@@ -634,10 +634,10 @@ int32_t csi_rtc_set_time(rtc_handle_t handle, const struct tm *rtctime)
     RTC_NULL_PARAM_CHK(handle);
     RTC_NULL_PARAM_CHK(rtctime);
 
-    ck_rtc_priv_t *rtc_priv = handle;
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
-    int32_t ret = ck_check_tm_ok((struct tm *)rtctime);
+    int32_t ret = wj_check_tm_ok((struct tm *)rtctime);
 
     if (ret < 0) {
         return ret;
@@ -651,7 +651,7 @@ int32_t csi_rtc_set_time(rtc_handle_t handle, const struct tm *rtctime)
     rtc_priv->rtc_base.tm_year = rtctime->tm_year;
 
     /* clr register should not be zero */
-    ret = ck_rtc_settime(addr, 10);
+    ret = wj_rtc_settime(addr, 10);
 
     if (ret < 0) {
         return ret;
@@ -671,8 +671,8 @@ int32_t csi_rtc_get_time(rtc_handle_t handle, struct tm *rtctime)
     RTC_NULL_PARAM_CHK(handle);
     RTC_NULL_PARAM_CHK(rtctime);
 
-    ck_rtc_priv_t *rtc_priv = handle;
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
     uint32_t timeout_count = 0;
 
@@ -682,7 +682,7 @@ int32_t csi_rtc_get_time(rtc_handle_t handle, struct tm *rtctime)
         }
     }
 
-    time_t time = ck_rtc_readtime(addr);
+    time_t time = wj_rtc_readtime(addr);
     time = time / 1000;
     time += mktime(&(rtc_priv->rtc_base));
     gmtime_r(&time, rtctime);
@@ -700,10 +700,10 @@ int32_t csi_rtc_start(rtc_handle_t handle)
 {
     RTC_NULL_PARAM_CHK(handle);
 
-    ck_rtc_priv_t *rtc_priv = handle;
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
-    ck_rtc_enable(addr);
+    wj_rtc_enable(addr);
     return 0;
 }
 
@@ -716,10 +716,10 @@ int32_t csi_rtc_stop(rtc_handle_t handle)
 {
     RTC_NULL_PARAM_CHK(handle);
 
-    ck_rtc_priv_t *rtc_priv = handle;
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
-    ck_rtc_disable(addr);
+    wj_rtc_disable(addr);
     return 0;
 }
 
@@ -736,8 +736,8 @@ rtc_status_t csi_rtc_get_status(rtc_handle_t handle)
         return rtc_status;
     }
 
-    ck_rtc_priv_t *rtc_priv = handle;
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
     if (addr->RTC_CCR & 0x4) {
         rtc_status.active = 1;
@@ -761,10 +761,10 @@ int32_t csi_rtc_set_alarm(rtc_handle_t handle, const struct tm *rtctime)
     RTC_NULL_PARAM_CHK(handle);
     RTC_NULL_PARAM_CHK(rtctime);
 
-    ck_rtc_priv_t *rtc_priv = (ck_rtc_priv_t *)handle;
+    wj_rtc_priv_t *rtc_priv = (wj_rtc_priv_t *)handle;
 
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
-    ret = ck_check_tm_ok((struct tm *)rtctime);
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
+    ret = wj_check_tm_ok((struct tm *)rtctime);
 
     if (ret < 0) {
         goto error_time;
@@ -781,7 +781,7 @@ int32_t csi_rtc_set_alarm(rtc_handle_t handle, const struct tm *rtctime)
         goto error_time;
     }
 
-    ck_rtc_setmarchtime(addr, settime);
+    wj_rtc_setmarchtime(addr, settime);
 
     return 0;
 error_time:
@@ -799,13 +799,13 @@ int32_t csi_rtc_enable_alarm(rtc_handle_t handle, uint8_t en)
 {
     RTC_NULL_PARAM_CHK(handle);
 
-    ck_rtc_priv_t *rtc_priv = handle;
-    ck_rtc_reg_t *addr = (ck_rtc_reg_t *)(rtc_priv->base);
+    wj_rtc_priv_t *rtc_priv = handle;
+    wj_rtc_reg_t *addr = (wj_rtc_reg_t *)(rtc_priv->base);
 
     if (en == 1) {
-        ck_rtc_int_enable(addr);
+        wj_rtc_int_enable(addr);
     } else if (en == 0) {
-        ck_rtc_int_disable(addr);
+        wj_rtc_int_disable(addr);
     } else {
         return ERR_RTC(DRV_ERROR_PARAMETER);
     }

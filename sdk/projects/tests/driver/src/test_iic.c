@@ -11,7 +11,7 @@
 #include "test_driver_config.h"
 #include <csi_config.h>
 
-#define  CK_IIC_SLAVE_ADDR         0x50
+#define  IIC_SLAVE_ADDR         0x50
 #define  EEPROM_PAGE_SIZE          32
 #define  EEPROM_SIZE               8192
 #define  EEPROM_SUB_ADDR_START     0x0000
@@ -30,9 +30,9 @@ typedef struct {
 } iic_test_t;
 
 static iic_test_t iic_config_cases[] = {
-    {NULL, (uint32_t)NULL, IIC_MODE_MASTER, IIC_BUS_SPEED_HIGH, IIC_ADDRESS_10BIT + 1, CK_IIC_SLAVE_ADDR, CSI_DRV_ERRNO_IIC_BASE | DRV_ERROR_PARAMETER},
-    {NULL, (uint32_t)NULL, IIC_MODE_SLAVE + 1, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_10BIT, CK_IIC_SLAVE_ADDR, CSI_DRV_ERRNO_IIC_BASE | DRV_ERROR_PARAMETER},
-    {NULL, (uint32_t)NULL, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_10BIT, CK_IIC_SLAVE_ADDR, 0}
+    {NULL, (uint32_t)NULL, IIC_MODE_MASTER, IIC_BUS_SPEED_HIGH, IIC_ADDRESS_10BIT + 1, IIC_SLAVE_ADDR, CSI_DRV_ERRNO_IIC_BASE | DRV_ERROR_PARAMETER},
+    {NULL, (uint32_t)NULL, IIC_MODE_SLAVE + 1, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_10BIT, IIC_SLAVE_ADDR, CSI_DRV_ERRNO_IIC_BASE | DRV_ERROR_PARAMETER},
+    {NULL, (uint32_t)NULL, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_10BIT, IIC_SLAVE_ADDR, 0}
 
 };
 
@@ -63,14 +63,14 @@ static void test_at24c64_write_read(void)
     ASSERT_TRUE(iic_handle != NULL);
 
     int32_t ret;
-    ret = csi_iic_config(iic_handle, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_7BIT, CK_IIC_SLAVE_ADDR);
+    ret = csi_iic_config(iic_handle, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_7BIT, IIC_SLAVE_ADDR);
     ASSERT_TRUE(ret == 0);
 
     memset(write_data + 2, 0xae, EEPROM_PAGE_SIZE);
 
     cb_transfer_flag = 0;
     bool xfer_pending = false;
-    ret = csi_iic_master_send(iic_handle, CK_IIC_SLAVE_ADDR, write_data, sizeof(write_data), xfer_pending);
+    ret = csi_iic_master_send(iic_handle, IIC_SLAVE_ADDR, write_data, sizeof(write_data), xfer_pending);
     ASSERT_TRUE(ret == 0);
 
     timeout = 0;
@@ -87,7 +87,7 @@ static void test_at24c64_write_read(void)
     mdelay(10);
 
     cb_transfer_flag = 0;
-    ret = csi_iic_master_send(iic_handle, CK_IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
+    ret = csi_iic_master_send(iic_handle, IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
     ASSERT_TRUE(ret == 0);
 
     timeout = 0;
@@ -103,7 +103,7 @@ static void test_at24c64_write_read(void)
     ASSERT_TRUE(cb_transfer_flag == 1);
 
     cb_transfer_flag = 0;
-    ret = csi_iic_master_receive(iic_handle, CK_IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
+    ret = csi_iic_master_receive(iic_handle, IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
     ASSERT_TRUE(ret == 0);
 
     timeout = 0;
@@ -138,7 +138,7 @@ static void test_csi_iic_abort_transfer(void)
     ASSERT_TRUE(iic_handle != NULL);
 
     int32_t ret;
-    ret = csi_iic_config(iic_handle, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_7BIT, CK_IIC_SLAVE_ADDR);
+    ret = csi_iic_config(iic_handle, IIC_MODE_MASTER, IIC_BUS_SPEED_STANDARD, IIC_ADDRESS_7BIT, IIC_SLAVE_ADDR);
     ASSERT_TRUE(ret == 0);
 
     memset(read_data + 2, 0x0, EEPROM_PAGE_SIZE);
@@ -146,7 +146,7 @@ static void test_csi_iic_abort_transfer(void)
     uint32_t timeout = 0x3ffff;
     cb_transfer_flag = 0;
     bool xfer_pending = false;
-    ret = csi_iic_master_send(iic_handle, CK_IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
+    ret = csi_iic_master_send(iic_handle, IIC_SLAVE_ADDR, read_data, 2, xfer_pending);
     ASSERT_TRUE(ret == 0);
 
     while (timeout) {
@@ -161,7 +161,7 @@ static void test_csi_iic_abort_transfer(void)
 
     timeout = 0x3ffff;
     cb_transfer_flag = 0;
-    ret = csi_iic_master_receive(iic_handle, CK_IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
+    ret = csi_iic_master_receive(iic_handle, IIC_SLAVE_ADDR, read_data + 2, sizeof(read_data) - 2, xfer_pending);
     ASSERT_TRUE(ret == 0);
 
     ret = csi_iic_abort_transfer(iic_handle);

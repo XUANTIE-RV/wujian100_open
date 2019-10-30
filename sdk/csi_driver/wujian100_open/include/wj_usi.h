@@ -3,13 +3,13 @@
  */
 
 /******************************************************************************
- * @file     ck_usi.h
+ * @file     wj_usi.h
  * @brief    header file for usi driver
  * @version  V1.0
  * @date     02. June 2017
  ******************************************************************************/
-#ifndef _CK_USI_H_
-#define _CK_USI_H_
+#ifndef _WJ_USI_H_
+#define _WJ_USI_H_
 
 #include <stdio.h>
 #include "errno.h"
@@ -112,14 +112,14 @@ typedef struct {
     __IOM uint32_t USI_INTR_CLR;           /* Offset 0x060(R/W) */
     __IOM uint32_t USI_DMA_CTRL;           /* Offset 0x064(R/W) */
     __IOM uint32_t USI_DMA_THRESHOLD;      /* Offset 0x068(R/W) */
-} ck_usi_reg_t;
+} wj_usi_reg_t;
 
-void ck_usi_set_rxfifo_th(ck_usi_reg_t *addr, uint32_t length);
+void wj_usi_set_rxfifo_th(wj_usi_reg_t *addr, uint32_t length);
 int32_t drv_usi_initialize(int32_t idx);
 int32_t drv_usi_uninitialize(int32_t idx);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _CK_USI_H_ */
+#endif /* _WJ_USI_H_ */
 

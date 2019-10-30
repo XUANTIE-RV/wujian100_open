@@ -4,13 +4,13 @@
 
 
 /******************************************************************************
- * @file     dw_gpio.h
+ * @file     wj_oip_gpio.h
  * @brief    header file for GPIO Driver
  * @version  V1.0
- * @date     02. June 2017
+ * @date     02. June 2019
  ******************************************************************************/
-#ifndef _DW_GPIO_H_
-#define _DW_GPIO_H_
+#ifndef _WJ_OIP_GPIO_H_
+#define _WJ_OIP_GPIO_H_
 
 #include "drv_gpio.h"
 #include "soc.h"
@@ -25,7 +25,7 @@ typedef struct {
     __IOM uint32_t SWPORT_DDR;                    /* Offset: 0x004 (W/R)  PortA data direction register */
     __IOM uint32_t PORT_CTL;                      /* Offset: 0x008 (W/R)  PortA source register */
 
-} dw_gpio_reg_t;
+} wj_oip_gpio_reg_t;
 
 typedef struct {
     __IOM uint32_t INTEN;                         /* Offset: 0x000 (W/R)  Interrupt enable register */
@@ -41,7 +41,7 @@ typedef struct {
     __IOM uint32_t revreg2[2];                    /* Offset: 0x028 (W/R)  Reserve register */
     __IOM uint32_t LS_SYNC;                       /* Offset: 0x030 (W/R)  Level-sensitive synchronization enable register */
 
-} dw_gpio_control_reg_t;
+} wj_oip_gpio_control_reg_t;
 
 #ifdef __cplusplus
 }
