@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     ck_usi_usart.c
+ * @file     wj_usi_usart.c
  * @brief    CSI Source File for USI usart Driver
  * @version  V1.0
  * @date     02. June 2017
@@ -17,8 +17,8 @@
 #include <string.h>
 #include <drv_irq.h>
 #include <drv_usi_usart.h>
-#include <ck_usi_usart.h>
-#include <ck_usi.h>
+#include <wj_usi_usart.h>
+#include <wj_usi.h>
 #include <soc.h>
 #include <pin_name.h>
 
@@ -45,9 +45,9 @@ typedef struct {
     uint32_t last_tx_num;
     uint32_t last_rx_num;
     int32_t idx;
-} ck_usi_usart_priv_t;
+} wj_usi_usart_priv_t;
 
-static ck_usi_usart_priv_t usi_usart_instance[CONFIG_USI_NUM];
+static wj_usi_usart_priv_t usi_usart_instance[CONFIG_USI_NUM];
 
 static const usart_capabilities_t usart_capabilities = {
     .asynchronous = 1,          /* supports USART (Asynchronous) mode */
@@ -67,8 +67,8 @@ extern int32_t target_usi_usart_init(int32_t idx, uint32_t *base, uint32_t *irq,
 */
 int32_t drv_usi_usart_config_baudrate(usart_handle_t handle, uint32_t baudrate)
 {
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     addr->USI_EN = 0x0;
     /* baudrate=(seriak clock freq)/(16* (divisor + 1); algorithm :rounding*/
@@ -94,8 +94,8 @@ int32_t drv_usi_usart_config_baudrate(usart_handle_t handle, uint32_t baudrate)
 int32_t drv_usi_usart_config_mode(usart_handle_t handle, usart_mode_e mode)
 {
     USART_NULL_PARAM_CHK(handle);
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     addr->USI_EN = 0x0;
 
     if (mode == USART_MODE_ASYNCHRONOUS) {
@@ -116,8 +116,8 @@ int32_t drv_usi_usart_config_mode(usart_handle_t handle, usart_mode_e mode)
 int32_t drv_usi_usart_config_parity(usart_handle_t handle, usart_parity_e parity)
 {
     USART_NULL_PARAM_CHK(handle);
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     addr->USI_EN = 0x0;
 
     switch (parity) {
@@ -155,8 +155,8 @@ int32_t drv_usi_usart_config_parity(usart_handle_t handle, usart_parity_e parity
 int32_t drv_usi_usart_config_stopbits(usart_handle_t handle, usart_stop_bits_e stopbit)
 {
     USART_NULL_PARAM_CHK(handle);
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     addr->USI_EN = 0x0;
 
     switch (stopbit) {
@@ -194,8 +194,8 @@ int32_t drv_usi_usart_config_stopbits(usart_handle_t handle, usart_stop_bits_e s
 int32_t drv_usi_usart_config_databits(usart_handle_t handle, usart_data_bits_e databits)
 {
     USART_NULL_PARAM_CHK(handle);
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     addr->USI_EN = 0x0;
 
@@ -232,13 +232,13 @@ int32_t drv_usi_usart_config_databits(usart_handle_t handle, usart_data_bits_e d
   \brief       interrupt service function for transmitter holding register empty.
   \param[in]   usart_priv usart private to operate.
 */
-static void ck_usart_intr_threshold_empty(ck_usi_usart_priv_t *usart_priv)
+static void ck_usart_intr_threshold_empty(wj_usi_usart_priv_t *usart_priv)
 {
     if (usart_priv->tx_total_num == 0) {
         return;
     }
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     if (usart_priv->tx_cnt >= usart_priv->tx_total_num) {
         addr->USI_INTR_EN &= (~USI_INT_TX_EMPTY);
@@ -272,14 +272,14 @@ static void ck_usart_intr_threshold_empty(ck_usi_usart_priv_t *usart_priv)
   \brief        interrupt service function for receiver data available.
   \param[in]   usart_priv usart private to operate.
 */
-static void ck_usart_intr_recv_data(ck_usi_usart_priv_t *usart_priv)
+static void ck_usart_intr_recv_data(wj_usi_usart_priv_t *usart_priv)
 {
     if ((usart_priv->rx_total_num == 0) || (usart_priv->rx_buf == NULL)) {
         usart_priv->cb_event(usart_priv->idx, USART_EVENT_RECEIVED);
         return;
     }
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     uint32_t rxfifo_num = (addr->USI_FIFO_STA >> 16) & 0xf;
     uint32_t rxdata_num = (rxfifo_num > usart_priv->rx_total_num) ? usart_priv->rx_total_num : rxfifo_num;
     uint32_t i;
@@ -307,7 +307,7 @@ static void ck_usart_intr_recv_data(ck_usi_usart_priv_t *usart_priv)
   \brief        interrupt service function for character timeout.
   \param[in]   usart_priv usart private to operate.
 */
-static void ck_usart_intr_char_timeout(ck_usi_usart_priv_t *usart_priv)
+static void ck_usart_intr_char_timeout(wj_usi_usart_priv_t *usart_priv)
 {
     if ((usart_priv->rx_total_num != 0) && (usart_priv->rx_buf != NULL)) {
         ck_usart_intr_recv_data(usart_priv);
@@ -317,7 +317,7 @@ static void ck_usart_intr_char_timeout(ck_usi_usart_priv_t *usart_priv)
     if (usart_priv->cb_event) {
         usart_priv->cb_event(usart_priv->idx, USART_EVENT_RECEIVED);
     } else {
-        ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+        wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
         addr->USI_EN &= ~USI_RX_FIFO_EN;
         addr->USI_EN |= USI_RX_FIFO_EN;
     }
@@ -327,9 +327,9 @@ static void ck_usart_intr_char_timeout(ck_usi_usart_priv_t *usart_priv)
   \brief        interrupt service function for receiver line.
   \param[in]   usart_priv usart private to operate.
 */
-static void ck_usart_intr_recv_line(ck_usi_usart_priv_t *usart_priv)
+static void ck_usart_intr_recv_line(wj_usi_usart_priv_t *usart_priv)
 {
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     addr->USI_EN &= ~USI_RX_FIFO_EN;
     addr->USI_EN |= USI_RX_FIFO_EN;
 
@@ -338,10 +338,10 @@ static void ck_usart_intr_recv_line(ck_usi_usart_priv_t *usart_priv)
     }
 }
 
-void ck_usi_usart_irqhandler(int idx)
+void wj_usi_usart_irqhandler(int idx)
 {
-    ck_usi_usart_priv_t *usart_priv = &usi_usart_instance[idx];
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = &usi_usart_instance[idx];
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     uint32_t intr_state = addr->USI_INTR_STA & 0x3ffff;
 
@@ -383,8 +383,8 @@ void ck_usi_usart_irqhandler(int idx)
 */
 int32_t drv_usi_usart_getchar(usart_handle_t handle, uint8_t *ch)
 {
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     addr->USI_EN = 0x7;
     addr->USI_EN = 0xf;
@@ -404,8 +404,8 @@ int32_t drv_usi_usart_getchar(usart_handle_t handle, uint8_t *ch)
 */
 int32_t drv_usi_usart_putchar(usart_handle_t handle, uint8_t ch)
 {
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     //addr->USI_EN = 0xb;
     //addr->USI_EN = 0xf;
     addr->USI_TX_RX_FIFO = ch;
@@ -460,19 +460,19 @@ usart_handle_t drv_usi_usart_initialize(int32_t idx, usart_event_cb_t cb_event)
         return NULL;
     }
 
-    ck_usi_usart_priv_t *usart_priv = &usi_usart_instance[idx];
+    wj_usi_usart_priv_t *usart_priv = &usi_usart_instance[idx];
 
     usart_priv->base = base;
     usart_priv->idx = idx;
     usart_priv->irq = irq;
     usart_priv->cb_event = cb_event;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     addr->USI_EN = 0x0;
-    addr->USI_INTR_UNMASK = CK_UART_INT_ENABLE_DEFAUL;
-    addr->USI_INTR_EN = CK_UART_INT_ENABLE_DEFAUL;
+    addr->USI_INTR_UNMASK = WJ_UART_INT_ENABLE_DEFAUL;
+    addr->USI_INTR_EN = WJ_UART_INT_ENABLE_DEFAUL;
 
-    ck_usi_set_rxfifo_th(addr, USI_RX_MAX_FIFO);
+    wj_usi_set_rxfifo_th(addr, USI_RX_MAX_FIFO);
 
     addr->USI_MODE_SEL = USI_MODE_UART;
     drv_irq_register(usart_priv->irq, handler);
@@ -490,8 +490,8 @@ int32_t drv_usi_usart_uninitialize(usart_handle_t handle)
 {
     USART_NULL_PARAM_CHK(handle);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     drv_irq_disable(usart_priv->irq);
     drv_irq_unregister(usart_priv->irq);
@@ -524,8 +524,8 @@ int32_t drv_usi_usart_config(usart_handle_t handle,
                              usart_data_bits_e bits)
 {
     int32_t ret;
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     addr->USI_EN = 0x0;
     /* control the data_bit of the usart*/
@@ -584,8 +584,8 @@ int32_t drv_usi_usart_send(usart_handle_t handle, const void *data, uint32_t num
         return ERR_USART(DRV_ERROR_PARAMETER);
     }
 
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     usart_priv->tx_buf = (uint8_t *)data;
     usart_priv->tx_total_num = num;
@@ -610,9 +610,9 @@ int32_t drv_usi_usart_send(usart_handle_t handle, const void *data, uint32_t num
 int32_t drv_usi_usart_abort_send(usart_handle_t handle)
 {
     USART_NULL_PARAM_CHK(handle);
-    ck_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_usart_priv_t *usart_priv = handle;
 
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     addr->USI_INTR_EN &= (~USI_INT_TX_EMPTY);
 
     usart_priv->tx_cnt = usart_priv->tx_total_num;
@@ -637,7 +637,7 @@ int32_t drv_usi_usart_receive(usart_handle_t handle, void *data, uint32_t num)
     USART_NULL_PARAM_CHK(handle);
     USART_NULL_PARAM_CHK(data);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_usart_priv_t *usart_priv = handle;
 
     usart_priv->rx_buf = (uint8_t *)data;   // Save receive buffer usart
     usart_priv->rx_total_num = num;         // Save number of data to be received
@@ -659,8 +659,8 @@ int32_t drv_usi_usart_receive_query(usart_handle_t handle, void *data, uint32_t 
     USART_NULL_PARAM_CHK(handle);
     USART_NULL_PARAM_CHK(data);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
     int32_t recv_num = 0;
     uint8_t *dest = (uint8_t *)data;
 
@@ -684,7 +684,7 @@ int32_t drv_usi_usart_receive_query(usart_handle_t handle, void *data, uint32_t 
 int32_t drv_usi_usart_abort_receive(usart_handle_t handle)
 {
     USART_NULL_PARAM_CHK(handle);
-    ck_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_usart_priv_t *usart_priv = handle;
 
     usart_priv->rx_cnt = usart_priv->rx_total_num;
     return 0;
@@ -731,7 +731,7 @@ usart_status_t drv_usi_usart_get_status(usart_handle_t handle)
     }
 
     usart_status_t usart_status = {0};
-    ck_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_usart_priv_t *usart_priv = handle;
 
     usart_status.tx_busy = usart_priv->tx_busy;
     usart_status.rx_busy = usart_priv->rx_busy;
@@ -775,8 +775,8 @@ int32_t drv_usi_usart_flush(usart_handle_t handle, usart_flush_type_e type)
 {
     USART_NULL_PARAM_CHK(handle);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     if (type == USART_FLUSH_WRITE) {
         addr->USI_EN &= ~USI_TX_FIFO_EN;
@@ -801,8 +801,8 @@ int32_t drv_usi_usart_set_interrupt(usart_handle_t handle, usart_intr_type_e typ
 {
     USART_NULL_PARAM_CHK(handle);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
-    ck_usi_reg_t *addr = (ck_usi_reg_t *)(usart_priv->base);
+    wj_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_reg_t *addr = (wj_usi_reg_t *)(usart_priv->base);
 
     switch (type) {
         case USART_INTR_WRITE:
@@ -844,7 +844,7 @@ uint32_t drv_usi_usart_get_tx_count(usart_handle_t handle)
 {
     USART_NULL_PARAM_CHK(handle);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_usart_priv_t *usart_priv = handle;
 
     if (usart_priv->tx_busy) {
         return usart_priv->tx_cnt;
@@ -862,7 +862,7 @@ uint32_t drv_usi_usart_get_rx_count(usart_handle_t handle)
 {
     USART_NULL_PARAM_CHK(handle);
 
-    ck_usi_usart_priv_t *usart_priv = handle;
+    wj_usi_usart_priv_t *usart_priv = handle;
 
     if (usart_priv->rx_busy) {
         return usart_priv->rx_cnt;

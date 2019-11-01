@@ -3,15 +3,15 @@
  */
 
 /******************************************************************************
- * @file     ck_usi_usart.h
+ * @file     wj_usi_usart.h
  * @brief    header file for usart driver
  * @version  V1.0
  * @date     02. June 2017
  ******************************************************************************/
-#ifndef _CK_USI_USART_H_
-#define _CK_USI_USART_H_
+#ifndef _WJ_USI_USART_H_
+#define _WJ_USI_USART_H_
 
-#include "ck_usi.h"
+#include "wj_usi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,11 +33,11 @@ extern "C" {
 #define CTRL_PARITY_ODD     (0x0 << 5)
 #define CTRL_PARITY_EVEN    (0x1 << 5)
 
-#define CK_UART_INT_ENABLE_DEFAUL (USI_INT_UART_PERR | USI_INT_UART_STOP | USI_INT_RX_WERR | \
+#define WJ_UART_INT_ENABLE_DEFAUL (USI_INT_UART_PERR | USI_INT_UART_STOP | USI_INT_RX_WERR | \
                                    USI_INT_RX_RERR | USI_INT_RX_FULL \
                                    | USI_INT_TX_WERR | USI_INT_TX_RERR)
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _CK_USI_USART_H_ */
+#endif /* _WJ_USI_USART_H_ */

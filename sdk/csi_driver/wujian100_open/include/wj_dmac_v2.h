@@ -3,13 +3,13 @@
  */
 
 /******************************************************************************
-* @file     ck_dmac_v2.h
+* @file     wj_dmac_v2.h
 * @brief    header file for DMAC Driver
 * @version  V1.0
 * @date     02. June 2017
 ******************************************************************************/
-#ifndef __CK_DMAC_V2_H
-#define __CK_DMAC_V2_H
+#ifndef __WJ_DMAC_V2_H
+#define __WJ_DMAC_V2_H
 #include <stdio.h>
 #include <soc.h>
 
@@ -17,26 +17,26 @@
 extern "C" {
 #endif
 
-#define CK_DMA_MAXCHANNEL  16
+#define WJ_DMA_MAXCHANNEL  16
 
-#define CK_DMA_INT_EN      1
-#define CK_DMA_CH_EN       1
-#define CK_DMA_CH_REQ      1
-#define CK_DMACCFG_EN      1
+#define WJ_DMA_INT_EN      1
+#define WJ_DMA_CH_EN       1
+#define WJ_DMA_CH_REQ      1
+#define WJ_DMACCFG_EN      1
 
-#define CK_DMA_TRGETCMPFR  0x8
-#define CK_DMA_HTFR        0x4
-#define CK_DMA_TFR         0x2
-#define CK_DMA_ERR         0x1
+#define WJ_DMA_TRGETCMPFR  0x8
+#define WJ_DMA_HTFR        0x4
+#define WJ_DMA_TFR         0x2
+#define WJ_DMA_ERR         0x1
 
-#define CK_DMA_INTC        0x1f
-#define CK_DMA_MASK        0x13
+#define WJ_DMA_INTC        0x1f
+#define WJ_DMA_MASK        0x13
 
-#define CK_CHINTM_RESETVALUE    0x0
-#define CK_CHINTC_RESETVALUE    0x0
+#define WJ_CHINTM_RESETVALUE    0x0
+#define WJ_CHINTC_RESETVALUE    0x0
 
-#define CK_DMA_ALL_CAHNNELS_PEND_INTR_VALID          0x0000ffff
-#define CK_DMA_ALL_CAHNNELS_DATA_TRANS_BUSY_VALID    0x0000ffff
+#define WJ_DMA_ALL_CAHNNELS_PEND_INTR_VALID          0x0000ffff
+#define WJ_DMA_ALL_CAHNNELS_DATA_TRANS_BUSY_VALID    0x0000ffff
 
 typedef enum {
     DMA_ADDR_INCREMENT = 0,
@@ -85,9 +85,9 @@ typedef enum {
     DMA_PRIOTITY15 = 15
 } dma_priority_t;
 
-#define CK_V2_DMAC_STATUSCHPEND    (CSKY_DMAC0_BASE + 0x330)
-#define CK_V2_DMAC_CHSR            (CSKY_DMAC0_BASE + 0x330 + 0x8)
-#define CK_V2_DMAC_DMACCFG         (CSKY_DMAC0_BASE + 0x330 + 0xc)
+#define WJ_V2_DMAC_STATUSCHPEND    (WJ_DMAC0_BASE + 0x330)
+#define WJ_V2_DMAC_CHSR            (WJ_DMAC0_BASE + 0x330 + 0x8)
+#define WJ_V2_DMAC_DMACCFG         (WJ_DMAC0_BASE + 0x330 + 0xc)
 typedef struct {
     __IOM uint32_t   SAR;       /* offset: 0x00 (R/W) Channel Source Address Register        */
     __IOM uint32_t   DAR;       /* offset: 0x04 (R/W) Channel Destination Address Register   */
@@ -98,9 +98,9 @@ typedef struct {
     __IOM uint32_t   CHINTC;   /* offset: 0x18 (R/W) Channel Interrupt Clear Register       */
     __IOM uint32_t   CHSREQ;   /* offset: 0x1C (R/W) Channel Software Request Register      */
     __IOM uint32_t   CHEN;     /* offset: 0x20 (R/W) Channel Enable Register                */
-} ck_dma_reg_t;
+} wj_dma_reg_t;
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CK_DMAC_V2_H */
+#endif /* __WJ_DMAC_V2_H */

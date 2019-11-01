@@ -3,7 +3,7 @@
  */
 
 /******************************************************************************
-* @file     ck_dmac_v2.c
+* @file     wj_dmac_v2.c
 * @brief    CSI Source File for DMAC Driver
 * @version  V1.0
 * @date     02. June 2017
@@ -13,7 +13,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <soc.h>
-#include <ck_dmac_v2.h>
+#include <wj_dmac_v2.h>
 #include <csi_core.h>
 #include <drv_irq.h>
 #include <drv_dmac.h>
@@ -34,16 +34,16 @@ typedef struct {
     dma_trig_trans_mode_e mode;
     dma_status_e status;
     uint8_t ch_opened;
-} ck_dma_priv_t;
+} wj_dma_priv_t;
 
 extern int32_t target_get_dmac(int32_t idx, uint32_t *base, uint32_t *irq, void **handler);
-static ck_dma_priv_t dma_instance[CONFIG_DMA_CHANNEL_NUM];
+static wj_dma_priv_t dma_instance[CONFIG_DMA_CHANNEL_NUM];
 
 static const dma_capabilities_t dma_capabilities = {
     .unalign_addr = 1,          ///< support for unalign address transfer when memory is source
 };
 
-static int32_t ck_dma_set_total_size(ck_dma_reg_t *addr, uint32_t len)
+static int32_t wj_dma_set_total_size(wj_dma_reg_t *addr, uint32_t len)
 {
     addr->CHCTRLA &= 0xff000fff;
     addr->CHCTRLA |= (len - 1) << 12;
@@ -51,7 +51,7 @@ static int32_t ck_dma_set_total_size(ck_dma_reg_t *addr, uint32_t len)
     return 0;
 }
 
-static int32_t ck_dma_set_channel(ck_dma_reg_t *addr, uint32_t source, uint32_t dest)
+static int32_t wj_dma_set_channel(wj_dma_reg_t *addr, uint32_t source, uint32_t dest)
 {
     addr->SAR = source;
     addr->DAR = dest ;
@@ -59,7 +59,7 @@ static int32_t ck_dma_set_channel(ck_dma_reg_t *addr, uint32_t source, uint32_t 
     return 0;
 }
 
-static int32_t ck_dma_set_addrinc(ck_dma_reg_t *addr, enum_addr_state_e src_addrinc, enum_addr_state_e dst_addrinc)
+static int32_t wj_dma_set_addrinc(wj_dma_reg_t *addr, enum_addr_state_e src_addrinc, enum_addr_state_e dst_addrinc)
 {
     if ((src_addrinc != DMA_ADDR_INCREMENT && src_addrinc != DMA_ADDR_DECREMENT && src_addrinc != DMA_ADDR_NOCHANGE) ||
         (dst_addrinc != DMA_ADDR_INCREMENT && dst_addrinc != DMA_ADDR_DECREMENT && dst_addrinc != DMA_ADDR_NOCHANGE)) {
@@ -75,7 +75,7 @@ static int32_t ck_dma_set_addrinc(ck_dma_reg_t *addr, enum_addr_state_e src_addr
     return 0;
 }
 
-int32_t ck_dma_set_transferwidth(ck_dma_reg_t *addr, dma_datawidth_e src_width, dma_datawidth_e dst_width)
+int32_t wj_dma_set_transferwidth(wj_dma_reg_t *addr, dma_datawidth_e src_width, dma_datawidth_e dst_width)
 {
     if ((src_width != 1 && src_width != 2 && src_width != 4) ||
         (dst_width != 1 && dst_width != 2 && dst_width != 4)) {
@@ -111,14 +111,14 @@ int32_t ck_dma_set_transferwidth(ck_dma_reg_t *addr, dma_datawidth_e src_width, 
 
 }
 
-static int32_t ck_dma_trans_mode_set(ck_dma_reg_t *addr, dma_trig_trans_mode_e mode)
+static int32_t wj_dma_trans_mode_set(wj_dma_reg_t *addr, dma_trig_trans_mode_e mode)
 {
     addr->CHCTRLB &= 0xfffffff9;
     addr->CHCTRLB |= (mode << 1);
     return 0;
 }
 
-static int32_t ck_dma_set_addr_endian(ck_dma_reg_t *addr, dma_addr_endian_e src_endian, dma_addr_endian_e dst_endian)
+static int32_t wj_dma_set_addr_endian(wj_dma_reg_t *addr, dma_addr_endian_e src_endian, dma_addr_endian_e dst_endian)
 {
     addr->CHCTRLB &= 0xffff9fff;
     addr->CHCTRLB |= (src_endian << 13);
@@ -126,7 +126,7 @@ static int32_t ck_dma_set_addr_endian(ck_dma_reg_t *addr, dma_addr_endian_e src_
     return 0;
 }
 
-static int32_t ck_dma_set_singlemode(ck_dma_reg_t *addr, dma_config_t *config)
+static int32_t wj_dma_set_singlemode(wj_dma_reg_t *addr, dma_config_t *config)
 {
     addr->CHCTRLA &= 0xefffffff;
     addr->CHCTRLA |= (config->single_dir << 26);
@@ -150,7 +150,7 @@ static int32_t ck_dma_set_singlemode(ck_dma_reg_t *addr, dma_config_t *config)
     return 0;
 }
 
-static int32_t ck_dma_set_groupmode(ck_dma_reg_t *addr, dma_config_t *config)
+static int32_t wj_dma_set_groupmode(wj_dma_reg_t *addr, dma_config_t *config)
 {
     if (config->src_inc == DMA_ADDR_INC || config->src_inc == DMA_ADDR_DEC) {
         addr->CHCTRLA &= 0xdfffffff;
@@ -182,27 +182,27 @@ static int32_t ck_dma_set_groupmode(ck_dma_reg_t *addr, dma_config_t *config)
     return 0;
 }
 
-static int32_t ck_dma_set_blockmode(ck_dma_reg_t *addr)
+static int32_t wj_dma_set_blockmode(wj_dma_reg_t *addr)
 {
 
     return 0;
 }
 
-void ck_dma_irqhandler(int32_t idx)
+void wj_dma_irqhandler(int32_t idx)
 {
     uint32_t temp = 0;
     uint32_t i;
-    ck_dma_reg_t *addr;
+    wj_dma_reg_t *addr;
     uint32_t ch_max = idx * CONFIG_PER_DMAC_CHANNEL_NUM + CONFIG_PER_DMAC_CHANNEL_NUM;
     uint32_t base;
     target_get_dmac(idx * CONFIG_PER_DMAC_CHANNEL_NUM, &base, NULL, NULL);
 
     for (i = idx * CONFIG_PER_DMAC_CHANNEL_NUM ; i < ch_max; i++) {
-        addr = (ck_dma_reg_t *)(base + (i % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+        addr = (wj_dma_reg_t *)(base + (i % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
         temp = addr->CHINTS;
         addr->CHINTC = 0x1f;
 
-        if (temp & CK_DMA_TFR) {
+        if (temp & WJ_DMA_TFR) {
             break;
         }
     }
@@ -211,13 +211,13 @@ void ck_dma_irqhandler(int32_t idx)
         return;
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[i];
+    wj_dma_priv_t *dma_priv = &dma_instance[i];
 
-    if (temp & CK_DMA_TFR || (temp & (CK_DMA_TFR | CK_DMA_TRGETCMPFR))) {
+    if (temp & WJ_DMA_TFR || (temp & (WJ_DMA_TFR | WJ_DMA_TRGETCMPFR))) {
         dma_priv->status = DMA_STATE_DONE;
 
         if (dma_priv->cb_event) {
-            if (temp & CK_DMA_TFR) {
+            if (temp & WJ_DMA_TFR) {
                 dma_priv->cb_event(i, DMA_EVENT_TRANSFER_DONE, dma_priv->cb_arg);
             }
         }
@@ -225,8 +225,8 @@ void ck_dma_irqhandler(int32_t idx)
         return;
     }
 
-    if (temp & CK_DMA_ERR) {
-        addr->CHINTC |= CK_DMA_ERR;
+    if (temp & WJ_DMA_ERR) {
+        addr->CHINTC |= WJ_DMA_ERR;
 
         if (dma_priv->cb_event) {
             dma_priv->cb_event(i, DMA_EVENT_TRANSFER_ERROR, dma_priv->cb_arg);
@@ -334,15 +334,15 @@ int32_t csi_dma_alloc_channel_ex(int32_t ch)
         return -1;
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch_num];
+    wj_dma_priv_t *dma_priv = &dma_instance[ch_num];
 
     dma_priv->base = base;
     dma_priv->irq  = irq;
     dma_priv->status = DMA_STATE_READY;
-    ck_dma_reg_t *addr = (ck_dma_reg_t *)(dma_priv->base + (ch_num % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+    wj_dma_reg_t *addr = (wj_dma_reg_t *)(dma_priv->base + (ch_num % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
 
-    addr->CHINTM |= CK_DMA_MASK;
-    addr->CHINTC |= CK_DMA_INTC;
+    addr->CHINTM |= WJ_DMA_MASK;
+    addr->CHINTC |= WJ_DMA_INTC;
 
     result = csi_irq_save();
     uint32_t i;
@@ -360,8 +360,8 @@ int32_t csi_dma_alloc_channel_ex(int32_t ch)
 #ifdef CONFIG_LPM
         csi_dma_power_control(ch_num, DRV_POWER_FULL);
 #endif
-        *(volatile uint32_t *)CK_V2_DMAC_STATUSCHPEND = CK_DMA_ALL_CAHNNELS_PEND_INTR_VALID;
-        *(volatile uint32_t *)CK_V2_DMAC_CHSR = CK_DMA_ALL_CAHNNELS_DATA_TRANS_BUSY_VALID;
+        *(volatile uint32_t *)WJ_V2_DMAC_STATUSCHPEND = WJ_DMA_ALL_CAHNNELS_PEND_INTR_VALID;
+        *(volatile uint32_t *)WJ_V2_DMAC_CHSR = WJ_DMA_ALL_CAHNNELS_DATA_TRANS_BUSY_VALID;
     }
 
     csi_irq_restore(result);
@@ -401,15 +401,15 @@ int32_t csi_dma_alloc_channel(void)
         return -1;
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch_num];
+    wj_dma_priv_t *dma_priv = &dma_instance[ch_num];
 
     dma_priv->base = base;
     dma_priv->irq  = irq;
     dma_priv->status = DMA_STATE_READY;
-    ck_dma_reg_t *addr = (ck_dma_reg_t *)(dma_priv->base + (ch_num % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+    wj_dma_reg_t *addr = (wj_dma_reg_t *)(dma_priv->base + (ch_num % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
 
-    addr->CHINTM |= CK_DMA_MASK;
-    addr->CHINTC |= CK_DMA_INTC;
+    addr->CHINTM |= WJ_DMA_MASK;
+    addr->CHINTC |= WJ_DMA_INTC;
 
     result = csi_irq_save();
     uint32_t i;
@@ -427,8 +427,8 @@ int32_t csi_dma_alloc_channel(void)
 #ifdef CONFIG_LPM
         csi_dma_power_control(ch_num, DRV_POWER_FULL);
 #endif
-        *(volatile uint32_t *)CK_V2_DMAC_STATUSCHPEND = CK_DMA_ALL_CAHNNELS_PEND_INTR_VALID;
-        *(volatile uint32_t *)CK_V2_DMAC_CHSR = CK_DMA_ALL_CAHNNELS_DATA_TRANS_BUSY_VALID;
+        *(volatile uint32_t *)WJ_V2_DMAC_STATUSCHPEND = WJ_DMA_ALL_CAHNNELS_PEND_INTR_VALID;
+        *(volatile uint32_t *)WJ_V2_DMAC_CHSR = WJ_DMA_ALL_CAHNNELS_DATA_TRANS_BUSY_VALID;
     }
 
     csi_irq_restore(result);
@@ -449,14 +449,14 @@ void csi_dma_release_channel(int32_t ch)
         return;
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch];
-    ck_dma_reg_t *addr = (ck_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+    wj_dma_priv_t *dma_priv = &dma_instance[ch];
+    wj_dma_reg_t *addr = (wj_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
 
     dma_priv->status = DMA_STATE_FREE;
     dma_priv->ch_opened = 0;
 
-    addr->CHINTM = CK_CHINTM_RESETVALUE;
-    addr->CHINTC = CK_CHINTC_RESETVALUE;
+    addr->CHINTM = WJ_CHINTM_RESETVALUE;
+    addr->CHINTC = WJ_CHINTC_RESETVALUE;
 
     uint32_t ch_num;
 
@@ -498,7 +498,7 @@ int32_t csi_dma_config_channel(int32_t ch, dma_config_t *config, dma_event_cb_t 
         return ERR_DMA(DRV_ERROR_PARAMETER);
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch];
+    wj_dma_priv_t *dma_priv = &dma_instance[ch];
 
     if (!(config->src_tw) || !(config->dst_tw)) {
         return ERR_DMA(DRV_ERROR_PARAMETER);
@@ -518,35 +518,35 @@ int32_t csi_dma_config_channel(int32_t ch, dma_config_t *config, dma_event_cb_t 
     dma_priv->cb_arg = cb_arg;
     dma_priv->ch_mode = config->ch_mode;
 
-    ck_dma_reg_t *addr = (ck_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+    wj_dma_reg_t *addr = (wj_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
 
     /* Initializes corresponding channel registers */
-    ret = ck_dma_set_transferwidth(addr, config->src_tw, config->dst_tw);
+    ret = wj_dma_set_transferwidth(addr, config->src_tw, config->dst_tw);
 
     if (ret < 0) {
         return ret;
     }
 
-    ret = ck_dma_set_addrinc(addr, config->src_inc, config->dst_inc);
+    ret = wj_dma_set_addrinc(addr, config->src_inc, config->dst_inc);
 
     if (ret < 0) {
         return ret;
     }
 
-    ret = ck_dma_set_addr_endian(addr, config->src_endian, config->dst_endian);
+    ret = wj_dma_set_addr_endian(addr, config->src_endian, config->dst_endian);
 
     if (ret < 0) {
         return ret;
     }
 
-    ret = ck_dma_trans_mode_set(addr, config->mode);
+    ret = wj_dma_trans_mode_set(addr, config->mode);
 
     if (ret < 0) {
         return ret;
     }
 
     if (config->mode == DMA_SINGLE_TRIGGER) {
-        ret = ck_dma_set_singlemode(addr, config);
+        ret = wj_dma_set_singlemode(addr, config);
 
         if (ret < 0) {
             return ret;
@@ -560,13 +560,13 @@ int32_t csi_dma_config_channel(int32_t ch, dma_config_t *config, dma_event_cb_t 
             return ERR_DMA(DRV_ERROR_PARAMETER);
         }
 
-        ret = ck_dma_set_groupmode(addr, config);
+        ret = wj_dma_set_groupmode(addr, config);
 
         if (ret < 0) {
             return ret;
         }
     } else if (config->mode == DMA_BLOCK_TRIGGER) {
-        ret = ck_dma_set_blockmode(addr);
+        ret = wj_dma_set_blockmode(addr);
 
         if (ret < 0) {
             return ret;
@@ -592,9 +592,9 @@ void csi_dma_start(int32_t ch, void *psrcaddr, void *pdstaddr, uint32_t length)
         return;
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch];
+    wj_dma_priv_t *dma_priv = &dma_instance[ch];
 
-    ck_dma_reg_t *addr = (ck_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+    wj_dma_reg_t *addr = (wj_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
 
     if (dma_priv->mode == DMA_GROUP_TRIGGER || dma_priv->mode == DMA_BLOCK_TRIGGER) {
         if (dma_priv->src_tw == 0 || dma_priv->dst_tw == 0) {
@@ -610,28 +610,28 @@ void csi_dma_start(int32_t ch, void *psrcaddr, void *pdstaddr, uint32_t length)
         return;
     }
 
-    int32_t ret = ck_dma_set_total_size(addr, length);
+    int32_t ret = wj_dma_set_total_size(addr, length);
 
     if (ret < 0) {
         return ;
     }
 
-    ret = ck_dma_set_channel(addr, (uint32_t)psrcaddr, (uint32_t)pdstaddr);
+    ret = wj_dma_set_channel(addr, (uint32_t)psrcaddr, (uint32_t)pdstaddr);
 
     if (ret < 0) {
         return;
     }
 
-    addr->CHCTRLB |= CK_DMA_INT_EN;
+    addr->CHCTRLB |= WJ_DMA_INT_EN;
 
     //global register DMACCFG : the global DMAC enable bit only can be operated in security wolrd.
     //already do in startup.S
-    addr->CHEN |= CK_DMA_CH_EN;
+    addr->CHEN |= WJ_DMA_CH_EN;
 
-    *((volatile uint32_t *)CK_V2_DMAC_DMACCFG) = 0x01;
+    *((volatile uint32_t *)WJ_V2_DMAC_DMACCFG) = 0x01;
 
     if (dma_priv->ch_mode == DMA_MODE_SOFTWARE) {
-        addr->CHSREQ = CK_DMA_CH_REQ;
+        addr->CHSREQ = WJ_DMA_CH_REQ;
     }
 
     dma_priv->status = DMA_STATE_BUSY;
@@ -643,11 +643,11 @@ void csi_dma_stop(int32_t ch)
         return;
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch];
+    wj_dma_priv_t *dma_priv = &dma_instance[ch];
 
-    ck_dma_reg_t *addr = (ck_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
-    addr->CHCTRLB &= ~CK_DMA_INT_EN;      // interrupt disable
-    addr->CHEN    &= ~CK_DMA_CH_EN;
+    wj_dma_reg_t *addr = (wj_dma_reg_t *)(dma_priv->base + (ch % CONFIG_PER_DMAC_CHANNEL_NUM) * 0x30);
+    addr->CHCTRLB &= ~WJ_DMA_INT_EN;      // interrupt disable
+    addr->CHEN    &= ~WJ_DMA_CH_EN;
 
     if (dma_priv->ch_mode == DMA_MODE_SOFTWARE) {
         addr->CHSREQ = 0;
@@ -675,9 +675,9 @@ dma_status_e csi_dma_get_status(int32_t ch)
         return ERR_DMA(DRV_ERROR_PARAMETER);
     }
 
-    ck_dma_priv_t *dma_priv = &dma_instance[ch];
+    wj_dma_priv_t *dma_priv = &dma_instance[ch];
 
-    uint32_t tmp = *(uint32_t *)CK_V2_DMAC_CHSR;
+    uint32_t tmp = *(uint32_t *)WJ_V2_DMAC_CHSR;
 
     if ((1 << ch) & tmp) {
         if (dma_priv->status != DMA_STATE_BUSY) {

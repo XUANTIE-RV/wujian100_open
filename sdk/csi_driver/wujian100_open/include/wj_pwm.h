@@ -3,14 +3,14 @@
  */
 
 /******************************************************************************
- * @file     ck_pwm.h
+ * @file     wj_pwm.h
  * @brief    header file for pwm driver
  * @version  V1.0
  * @date     19. Feb 2019
  ******************************************************************************/
 
-#ifndef _CK_PWM_H_
-#define _CK_PWM_H_
+#ifndef _WJ_PWM_H_
+#define _WJ_PWM_H_
 
 #include "soc.h"
 
@@ -64,24 +64,24 @@ extern "C" {
 #define PWM_CAPIC_EDGE_TIME_IRQ_CLR(ch)     (1U << ((ch) + 6))
 
 typedef enum {
-    CKENUM_PWM_CH0    = 0,
-    CKENUM_PWM_CH1    = 1,
-    CKENUM_PWM_CH2    = 2,
-    CKENUM_PWM_CH3    = 3,
-    CKENUM_PWM_CH4    = 4,
-    CKENUM_PWM_CH5    = 5,
-    CKENUM_PWM_CH6    = 6,
-    CKENUM_PWM_CH7    = 7,
-    CKENUM_PWM_CH8    = 8,
-    CKENUM_PWM_CH9    = 9,
-    CKENUM_PWM_CH10   = 10,
-    CKENUM_PWM_CH11   = 11
-} CKENUM_PWM_CHANNEL;
+    WJENUM_PWM_CH0    = 0,
+    WJENUM_PWM_CH1    = 1,
+    WJENUM_PWM_CH2    = 2,
+    WJENUM_PWM_CH3    = 3,
+    WJENUM_PWM_CH4    = 4,
+    WJENUM_PWM_CH5    = 5,
+    WJENUM_PWM_CH6    = 6,
+    WJENUM_PWM_CH7    = 7,
+    WJENUM_PWM_CH8    = 8,
+    WJENUM_PWM_CH9    = 9,
+    WJENUM_PWM_CH10   = 10,
+    WJENUM_PWM_CH11   = 11
+} WJENUM_PWM_CHANNEL;
 
 typedef enum {
-    CKENUM_PWM_COUNT_UP          = 0,
-    CKENUM_PWM_COUNT_UP_DOWN     = 1
-} CKENUM_PWM_COUNTER_MODE;
+    WJENUM_PWM_COUNT_UP          = 0,
+    WJENUM_PWM_COUNT_UP_DOWN     = 1
+} WJENUM_PWM_COUNTER_MODE;
 
 typedef struct {
     __IOM uint32_t     PWMCFG;              /* Offset: 0x000 (R/W)  PWM configure register */
@@ -134,11 +134,11 @@ typedef struct {
     __IOM uint32_t     TIM01COUNT;          /* Offset: 0x0BC (R/W)  time current count time */
     __IOM uint32_t     TIM23COUNT;          /* Offset: 0x0C0 (R/W)  time current count time */
     __IOM uint32_t     TIM45COUNT;          /* Offset: 0x0C4 (R/W)  time current count time */
-} ck_pwm_reg_t;
+} wj_pwm_reg_t;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _CK_PWM_H_ */
+#endif /* _WJ_PWM_H_ */
 

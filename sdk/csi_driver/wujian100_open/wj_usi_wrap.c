@@ -4,10 +4,10 @@
 
 
 /******************************************************************************
- * @file     dw_usart.c
+ * @file     wj_usi_wrap.c
  * @brief    CSI Source File for usart Driver
  * @version  V1.0
- * @date     02. June 2017
+ * @date     02. June 2019
  ******************************************************************************/
 
 #include <csi_config.h>

@@ -55,22 +55,22 @@ struct {
     void *handler;
 }
 const sg_timer_config[CONFIG_TIMER_NUM] = {
-    {CSKY_TIMER0_BASE, TIM0_IRQn, TIM0_IRQHandler},
-    {CSKY_TIMER1_BASE, TIM1_IRQn, TIM1_IRQHandler},
-    {CSKY_TIMER2_BASE, TIM2_IRQn, TIM2_IRQHandler},
-    {CSKY_TIMER3_BASE, TIM3_IRQn, TIM3_IRQHandler},
-    {CSKY_TIMER4_BASE, TIM4_IRQn, TIM4_IRQHandler},
-    {CSKY_TIMER5_BASE, TIM5_IRQn, TIM5_IRQHandler},
-    {CSKY_TIMER6_BASE, TIM6_IRQn, TIM6_IRQHandler},
-    {CSKY_TIMER7_BASE, TIM7_IRQn, TIM7_IRQHandler},
-    {CSKY_TIMER8_BASE, TIM8_IRQn, TIM8_IRQHandler},
-    {CSKY_TIMER9_BASE, TIM9_IRQn, TIM9_IRQHandler},
-    {CSKY_TIMER10_BASE, TIM10_IRQn, TIM10_IRQHandler},
-    {CSKY_TIMER11_BASE, TIM11_IRQn, TIM11_IRQHandler},
-    {CSKY_TIMER12_BASE, TIM12_IRQn, TIM12_IRQHandler},
-    {CSKY_TIMER13_BASE, TIM13_IRQn, TIM13_IRQHandler},
-    {CSKY_TIMER14_BASE, TIM14_IRQn, TIM14_IRQHandler},
-    {CSKY_TIMER15_BASE, TIM15_IRQn, TIM15_IRQHandler},
+    {WJ_TIMER0_BASE, TIM0_IRQn, TIM0_IRQHandler},
+    {WJ_TIMER1_BASE, TIM1_IRQn, TIM1_IRQHandler},
+    {WJ_TIMER2_BASE, TIM2_IRQn, TIM2_IRQHandler},
+    {WJ_TIMER3_BASE, TIM3_IRQn, TIM3_IRQHandler},
+    {WJ_TIMER4_BASE, TIM4_IRQn, TIM4_IRQHandler},
+    {WJ_TIMER5_BASE, TIM5_IRQn, TIM5_IRQHandler},
+    {WJ_TIMER6_BASE, TIM6_IRQn, TIM6_IRQHandler},
+    {WJ_TIMER7_BASE, TIM7_IRQn, TIM7_IRQHandler},
+    {WJ_TIMER8_BASE, TIM8_IRQn, TIM8_IRQHandler},
+    {WJ_TIMER9_BASE, TIM9_IRQn, TIM9_IRQHandler},
+    {WJ_TIMER10_BASE, TIM10_IRQn, TIM10_IRQHandler},
+    {WJ_TIMER11_BASE, TIM11_IRQn, TIM11_IRQHandler},
+    {WJ_TIMER12_BASE, TIM12_IRQn, TIM12_IRQHandler},
+    {WJ_TIMER13_BASE, TIM13_IRQn, TIM13_IRQHandler},
+    {WJ_TIMER14_BASE, TIM14_IRQn, TIM14_IRQHandler},
+    {WJ_TIMER15_BASE, TIM15_IRQn, TIM15_IRQHandler},
 };
 
 int32_t target_get_timer_count(void)
@@ -132,7 +132,7 @@ int32_t target_get(const device_irq_table_t *table, int32_t idx, uint32_t *base,
 static const device_irq_table_t sg_wdt_config = {
     .count = CONFIG_WDT_NUM,
     .config = {
-        {CSKY_WDT_BASE, WDT_IRQn, WDT_IRQHandler}
+        {WJ_WDT_BASE, WDT_IRQn, WDT_IRQHandler}
     }
 };
 
@@ -144,7 +144,7 @@ int32_t target_get_wdt(int32_t idx, uint32_t *base, uint32_t *irq, void **handle
 static const device_irq_table_t sg_dmac_config = {
     .count = CONFIG_DMA_CHANNEL_NUM,
     .config = {
-        {CSKY_DMAC0_BASE, DMAC0_IRQn, DMAC0_IRQHandler},
+        {WJ_DMAC0_BASE, DMAC0_IRQn, DMAC0_IRQHandler},
     }
 };
 
@@ -160,7 +160,7 @@ struct {
     port_name_e port;
 }
 const sg_gpio_config[CONFIG_GPIO_NUM] = {
-    {CSKY_GPIO0_BASE, GPIO0_IRQn, CONFIG_GPIO_PIN_NUM, PORTA},
+    {WJ_GPIO0_BASE, GPIO0_IRQn, CONFIG_GPIO_PIN_NUM, PORTA},
 };
 
 typedef struct {
@@ -209,7 +209,7 @@ struct {
     uint32_t irq;
 }
 const sg_pmu_config[CONFIG_PMU_NUM] = {
-    {CSKY_PMU_BASE, PMU_IRQn}
+    {WJ_PMU_BASE, PMU_IRQn}
 };
 
 int32_t target_get_pmu(int32_t idx, uint32_t *base, uint32_t *irq)
@@ -235,7 +235,7 @@ struct {
     void *handler;
 }
 const sg_pwm_config[CONFIG_PWM_NUM] = {
-    {CSKY_PWM_BASE, PWM_IRQn, PWM_IRQHandler},
+    {WJ_PWM_BASE, PWM_IRQn, PWM_IRQHandler},
 };
 
 int32_t target_get_pwm_count(void)
@@ -270,9 +270,9 @@ struct {
     void *handler;
 }
 const sg_usi_config[CONFIG_USI_NUM] = {
-    {CSKY_USI0_BASE, USI0_IRQn, USI0_IRQHandler},
-    {CSKY_USI1_BASE, USI1_IRQn, USI1_IRQHandler},
-    {CSKY_USI2_BASE, USI2_IRQn, USI2_IRQHandler},
+    {WJ_USI0_BASE, USI0_IRQn, USI0_IRQHandler},
+    {WJ_USI1_BASE, USI1_IRQn, USI1_IRQHandler},
+    {WJ_USI2_BASE, USI2_IRQn, USI2_IRQHandler},
 };
 
 int32_t target_usi_init(int32_t idx, uint32_t *base, uint32_t *irq)
@@ -369,7 +369,7 @@ struct {
     void *handler;
 }
 const sg_rtc_config[CONFIG_RTC_NUM] = {
-    {CSKY_RTC0_BASE, RTC_IRQn, RTC_IRQHandler},
+    {WJ_RTC0_BASE, RTC_IRQn, RTC_IRQHandler},
 };
 
 int32_t target_get_rtc_count(void)
@@ -387,9 +387,9 @@ int32_t target_get_rtc(int32_t idx, uint32_t *base, uint32_t *irq, void **handle
         return -1;
     }
 
-    value  = readl(CSKY_PMU_BASE);
+    value  = readl(WJ_PMU_BASE);
     value &= ~BIT1;
-    writel(value, CSKY_PMU_BASE);
+    writel(value, WJ_PMU_BASE);
 
     if (base != NULL) {
         *base = sg_rtc_config[idx].base;

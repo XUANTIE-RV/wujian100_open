@@ -5,7 +5,7 @@
  /******************************************************************************
  * @file     startup.S
  * @brief    startup file. Should use with
- *           GCC for CSKY Embedded Processors
+ *           GCC for WUJIAN Embedded Processors
  * @version  V1.0
  * @date     29. July 2019
  ******************************************************************************/

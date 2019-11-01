@@ -16,16 +16,16 @@
 #include <csi_kernel.h>
 #endif
 
-extern void dw_timer_irqhandler(int32_t idx);
-extern void dw_gpio_irqhandler(int32_t idx);
+extern void wj_oip_timer_irqhandler(int32_t idx);
+extern void wj_oip_gpio_irqhandler(int32_t idx);
 extern void systick_handler(void);
 extern void xPortSysTickHandler(void);
 extern void OSTimeTick(void);
-extern void ck_pwm_irqhandler(int32_t idx);
-extern void ck_rtc_irqhandler(int32_t idx);
-extern void ck_usi_irqhandler(int32_t idx);
-extern void dw_wdt_irqhandler(int32_t idx);
-extern void ck_dma_irqhandler(int32_t idx);
+extern void wj_pwm_irqhandler(int32_t idx);
+extern void wj_rtc_irqhandler(int32_t idx);
+extern void wj_usi_irqhandler(int32_t idx);
+extern void wj_oip_wdt_irqhandler(int32_t idx);
+extern void wj_dma_irqhandler(int32_t idx);
 
 #define  ATTRIBUTE_ISR
 
@@ -64,166 +64,166 @@ ATTRIBUTE_ISR void CORET_IRQHandler(void)
 ATTRIBUTE_ISR void TIM0_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(0);
+    wj_oip_timer_irqhandler(0);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM1_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(1);
+    wj_oip_timer_irqhandler(1);
     CSI_INTRPT_EXIT();
 }
 ATTRIBUTE_ISR void TIM2_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(2);
+    wj_oip_timer_irqhandler(2);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM3_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(3);
+    wj_oip_timer_irqhandler(3);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM4_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(4);
+    wj_oip_timer_irqhandler(4);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM5_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(5);
+    wj_oip_timer_irqhandler(5);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM6_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(6);
+    wj_oip_timer_irqhandler(6);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM7_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(7);
+    wj_oip_timer_irqhandler(7);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM8_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(8);
+    wj_oip_timer_irqhandler(8);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM9_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(9);
+    wj_oip_timer_irqhandler(9);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM10_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(10);
+    wj_oip_timer_irqhandler(10);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM11_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(11);
+    wj_oip_timer_irqhandler(11);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM12_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(12);
+    wj_oip_timer_irqhandler(12);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM13_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(13);
+    wj_oip_timer_irqhandler(13);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM14_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(14);
+    wj_oip_timer_irqhandler(14);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void TIM15_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_timer_irqhandler(15);
+    wj_oip_timer_irqhandler(15);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void PWM_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    ck_pwm_irqhandler(0);
+    wj_pwm_irqhandler(0);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void RTC_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    ck_rtc_irqhandler(0);
+    wj_rtc_irqhandler(0);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void USI0_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    ck_usi_irqhandler(0);
+    wj_usi_irqhandler(0);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void USI1_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    ck_usi_irqhandler(1);
+    wj_usi_irqhandler(1);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void USI2_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    ck_usi_irqhandler(2);
+    wj_usi_irqhandler(2);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void WDT_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_wdt_irqhandler(0);
+    wj_oip_wdt_irqhandler(0);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void DMAC0_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    ck_dma_irqhandler(0);
+    wj_dma_irqhandler(0);
     CSI_INTRPT_EXIT();
 }
 
 ATTRIBUTE_ISR void GPIO0_IRQHandler(void)
 {
     CSI_INTRPT_ENTER();
-    dw_gpio_irqhandler(0);
+    wj_oip_gpio_irqhandler(0);
     CSI_INTRPT_EXIT();
 }

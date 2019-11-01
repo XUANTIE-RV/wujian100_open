@@ -5,7 +5,7 @@
  /******************************************************************************
  * @file     vectors.S
  * @brief    define default vector handlers. Should use with
- *           GCC for CSKY Embedded Processors
+ *           GCC for WUJIAN Embedded Processors
  * @version  V1.0
  * @date     8. otc 2019
  ******************************************************************************/

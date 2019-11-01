@@ -4,7 +4,7 @@
 
 
 /******************************************************************************
- * @file     ck_pwm.c
+ * @file     wj_pwm.c
  * @brief    CSI Source File for PWM Driver
  * @version  V1.0
  * @date     19. Feb 2019
@@ -13,7 +13,7 @@
 #include <csi_config.h>
 #include <drv_pwm.h>
 #include <drv_irq.h>
-#include <ck_pwm.h>
+#include <wj_pwm.h>
 #include <soc.h>
 
 #define ERR_PWM(errno) (CSI_DRV_ERRNO_PWM_BASE | errno)
@@ -30,12 +30,12 @@ typedef struct {
     uint32_t irq;
     uint32_t idx;
     pwm_event_cb_t pwm_event_cb[CONFIG_PER_PWM_CHANNEL_NUM];
-} ck_pwm_priv_t;
+} wj_pwm_priv_t;
 
 extern int32_t target_pwm_init(uint32_t idx, uint32_t *base, uint32_t *irq, void **handler);
 extern int32_t csi_pwm_power_control(pwm_handle_t handle, csi_power_stat_e state);
 
-static ck_pwm_priv_t pwm_instance[CONFIG_PWM_NUM];
+static wj_pwm_priv_t pwm_instance[CONFIG_PWM_NUM];
 
 #ifdef CONFIG_LPM
 static void manage_clock(pwm_handle_t handle, uint8_t enable)
@@ -45,7 +45,7 @@ static void manage_clock(pwm_handle_t handle, uint8_t enable)
 
 static void do_prepare_sleep_action(pwm_handle_t handle)
 {
-    ck_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_priv_t *pwm_priv = handle;
     uint32_t *abase = (uint32_t *)(pwm_priv->base);
     registers_save(pwm_priv->pwm_regs_saved, abase, 7);
     registers_save(&pwm_priv->pwm_regs_saved[7], abase + 9, 2);
@@ -59,7 +59,7 @@ static void do_prepare_sleep_action(pwm_handle_t handle)
 
 static void do_wakeup_sleep_action(pwm_handle_t handle)
 {
-    ck_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_priv_t *pwm_priv = handle;
     uint32_t *abase = (uint32_t *)(pwm_priv->base);
     registers_restore(abase, pwm_priv->pwm_regs_saved, 7);
     registers_restore(abase + 9, &pwm_priv->pwm_regs_saved[7], 2);
@@ -88,7 +88,7 @@ pwm_handle_t csi_pwm_initialize(uint32_t idx)
         return NULL;
     }
 
-    ck_pwm_priv_t *pwm_priv = &pwm_instance[idx];
+    wj_pwm_priv_t *pwm_priv = &pwm_instance[idx];
 
     pwm_priv->base      = base;
     pwm_priv->irq       = irq;
@@ -107,7 +107,7 @@ pwm_handle_t csi_pwm_initialize(uint32_t idx)
 */
 void csi_pwm_uninitialize(pwm_handle_t handle)
 {
-    ck_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_priv_t *pwm_priv = handle;
 
 #ifdef CONFIG_LPM
     csi_pwm_power_control(pwm_priv, DRV_POWER_OFF);
@@ -143,8 +143,8 @@ void drv_pwm_config_clockdiv(pwm_handle_t handle, uint8_t channel, uint32_t div)
 {
     PWM_NULL_PARAM_CHK_NORETVAL(handle);
 
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
     addr->PWMCFG &= ~(7 << 24);
 
     switch (div) {
@@ -196,8 +196,8 @@ uint32_t drv_pwm_get_clockdiv(pwm_handle_t handle, uint8_t channel)
     PWM_NULL_PARAM_CHK(handle);
 
     uint32_t pwmcfg, div_bits, clockdiv;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
     pwmcfg = addr->PWMCFG;
 
     div_bits = pwmcfg & PWM_CFG_CNTDIV_Msk;
@@ -254,7 +254,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
         return ERR_PWM(DRV_ERROR_PARAMETER);
     }
 
-    ck_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_priv_t *pwm_priv = handle;
     uint32_t counter;
     uint8_t cnt_div[8] = {1, 2, 4, 8, 16, 32, 64, 128};
     uint8_t count_div;
@@ -274,13 +274,13 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
     uint32_t cmp_counter = (drv_get_pwm_freq(pwm_priv->idx) / 1000000 * pulse_width_us / cnt_div[count_div]);
 
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
     uint32_t ctl_tmp = addr->PWMCTL;
     uint32_t temp;
 
-    if (channel == CKENUM_PWM_CH0 || channel == CKENUM_PWM_CH1) {
+    if (channel == WJENUM_PWM_CH0 || channel == WJENUM_PWM_CH1) {
         ctl_tmp &= 0xfffffffe;
-        addr->PWMCTL = ctl_tmp | (uint32_t)CKENUM_PWM_COUNT_UP;
+        addr->PWMCTL = ctl_tmp | (uint32_t)WJENUM_PWM_COUNT_UP;
 
         temp = addr->PWM01LOAD;
         temp &= 0xffff0000;
@@ -288,7 +288,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
         temp = addr->PWM0CMP;
 
-        if (channel == CKENUM_PWM_CH0) {
+        if (channel == WJENUM_PWM_CH0) {
             temp &= 0xffff0000;
             addr->PWM0CMP = temp | cmp_counter;
         } else {
@@ -297,9 +297,9 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
         }
     }
 
-    if (channel == CKENUM_PWM_CH2 || channel == CKENUM_PWM_CH3) {
+    if (channel == WJENUM_PWM_CH2 || channel == WJENUM_PWM_CH3) {
         ctl_tmp &= 0xfffffffd;
-        addr->PWMCTL = ctl_tmp | (uint32_t)CKENUM_PWM_COUNT_UP << 1;
+        addr->PWMCTL = ctl_tmp | (uint32_t)WJENUM_PWM_COUNT_UP << 1;
 
         temp = addr->PWM01LOAD;
         temp &= 0x0000ffff;
@@ -307,7 +307,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
         temp = addr->PWM1CMP;
 
-        if (channel == CKENUM_PWM_CH2) {
+        if (channel == WJENUM_PWM_CH2) {
             temp &= 0xffff0000;
             addr->PWM1CMP = temp | cmp_counter;
         } else {
@@ -316,9 +316,9 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
         }
     }
 
-    if (channel == CKENUM_PWM_CH4 || channel == CKENUM_PWM_CH5) {
+    if (channel == WJENUM_PWM_CH4 || channel == WJENUM_PWM_CH5) {
         ctl_tmp &= 0xfffffffb;
-        addr->PWMCTL = ctl_tmp | (uint32_t)CKENUM_PWM_COUNT_UP << 2;
+        addr->PWMCTL = ctl_tmp | (uint32_t)WJENUM_PWM_COUNT_UP << 2;
 
         temp = addr->PWM23LOAD;
         temp &= 0xffff0000;
@@ -326,7 +326,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
         temp = addr->PWM2CMP;
 
-        if (channel == CKENUM_PWM_CH4) {
+        if (channel == WJENUM_PWM_CH4) {
             temp &= 0xffff0000;
             addr->PWM2CMP = temp | cmp_counter;
         } else {
@@ -335,9 +335,9 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
         }
     }
 
-    if (channel == CKENUM_PWM_CH6 || channel == CKENUM_PWM_CH7) {
+    if (channel == WJENUM_PWM_CH6 || channel == WJENUM_PWM_CH7) {
         ctl_tmp &= 0xfffffff7;
-        addr->PWMCTL = ctl_tmp | (uint32_t)CKENUM_PWM_COUNT_UP << 3;
+        addr->PWMCTL = ctl_tmp | (uint32_t)WJENUM_PWM_COUNT_UP << 3;
 
         temp = addr->PWM23LOAD;
         temp &= 0x0000ffff;
@@ -345,7 +345,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
         temp = addr->PWM3CMP;
 
-        if (channel == CKENUM_PWM_CH6) {
+        if (channel == WJENUM_PWM_CH6) {
             temp &= 0xffff0000;
             addr->PWM3CMP = temp | cmp_counter;
         } else {
@@ -354,9 +354,9 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
         }
     }
 
-    if (channel == CKENUM_PWM_CH8 || channel == CKENUM_PWM_CH9) {
+    if (channel == WJENUM_PWM_CH8 || channel == WJENUM_PWM_CH9) {
         ctl_tmp &= 0xffffffef;
-        addr->PWMCTL = ctl_tmp | (uint32_t)CKENUM_PWM_COUNT_UP << 4;
+        addr->PWMCTL = ctl_tmp | (uint32_t)WJENUM_PWM_COUNT_UP << 4;
 
         temp = addr->PWM45LOAD;
         temp &= 0xffff0000;
@@ -364,7 +364,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
         temp = addr->PWM4CMP;
 
-        if (channel == CKENUM_PWM_CH8) {
+        if (channel == WJENUM_PWM_CH8) {
             temp &= 0xffff0000;
             addr->PWM4CMP = temp | cmp_counter;
         } else {
@@ -373,9 +373,9 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
         }
     }
 
-    if (channel == CKENUM_PWM_CH10 || channel == CKENUM_PWM_CH11) {
+    if (channel == WJENUM_PWM_CH10 || channel == WJENUM_PWM_CH11) {
         ctl_tmp &= 0xffffffdf;
-        addr->PWMCTL = ctl_tmp | (uint32_t)CKENUM_PWM_COUNT_UP << 5;
+        addr->PWMCTL = ctl_tmp | (uint32_t)WJENUM_PWM_COUNT_UP << 5;
 
         temp = addr->PWM45LOAD;
         temp &= 0x0000ffff;
@@ -383,7 +383,7 @@ int32_t csi_pwm_config(pwm_handle_t handle, uint8_t channel, uint32_t period_us,
 
         temp = addr->PWM5CMP;
 
-        if (channel == CKENUM_PWM_CH10) {
+        if (channel == WJENUM_PWM_CH10) {
             temp &= 0xffff0000;
             addr->PWM5CMP = temp | cmp_counter;
         } else {
@@ -405,30 +405,30 @@ void csi_pwm_start(pwm_handle_t handle, uint8_t channel)
 {
     PWM_NULL_PARAM_CHK_NORETVAL(handle);
 
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
-    if (channel == CKENUM_PWM_CH0 || channel == CKENUM_PWM_CH1) {
+    if (channel == WJENUM_PWM_CH0 || channel == WJENUM_PWM_CH1) {
         addr->PWMCFG |= 0x00000003;        /* PWM0 output enable */
     }
 
-    if (channel == CKENUM_PWM_CH2 || channel == CKENUM_PWM_CH3) {
+    if (channel == WJENUM_PWM_CH2 || channel == WJENUM_PWM_CH3) {
         addr->PWMCFG |= 0x0000000C;        /* PWM1 output enable */
     }
 
-    if (channel == CKENUM_PWM_CH4 || channel == CKENUM_PWM_CH5) {
+    if (channel == WJENUM_PWM_CH4 || channel == WJENUM_PWM_CH5) {
         addr->PWMCFG |= 0x00000030;        /* PWM2 output enable */
     }
 
-    if (channel == CKENUM_PWM_CH6 || channel == CKENUM_PWM_CH7) {
+    if (channel == WJENUM_PWM_CH6 || channel == WJENUM_PWM_CH7) {
         addr->PWMCFG |= 0x000000C0;        /* PWM3 output enable */
     }
 
-    if (channel == CKENUM_PWM_CH8 || channel == CKENUM_PWM_CH9) {
+    if (channel == WJENUM_PWM_CH8 || channel == WJENUM_PWM_CH9) {
         addr->PWMCFG |= 0x00000300;        /* PWM4 output enable */
     }
 
-    if (channel == CKENUM_PWM_CH10 || channel == CKENUM_PWM_CH11) {
+    if (channel == WJENUM_PWM_CH10 || channel == WJENUM_PWM_CH11) {
         addr->PWMCFG |= 0x00000C00;        /* PWM5 output enable */
     }
 }
@@ -443,40 +443,40 @@ void  csi_pwm_stop(pwm_handle_t handle, uint8_t channel)
 {
     PWM_NULL_PARAM_CHK_NORETVAL(handle);
 
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
-    if (channel == CKENUM_PWM_CH0 || channel == CKENUM_PWM_CH1) {
+    if (channel == WJENUM_PWM_CH0 || channel == WJENUM_PWM_CH1) {
         addr->PWMCFG &= ~0x00000003;        /* PWM0 output disable */
     }
 
-    if (channel == CKENUM_PWM_CH2 || channel == CKENUM_PWM_CH3) {
+    if (channel == WJENUM_PWM_CH2 || channel == WJENUM_PWM_CH3) {
         addr->PWMCFG &= ~0x0000000C;        /* PWM1 output disable */
     }
 
-    if (channel == CKENUM_PWM_CH4 || channel == CKENUM_PWM_CH5) {
+    if (channel == WJENUM_PWM_CH4 || channel == WJENUM_PWM_CH5) {
         addr->PWMCFG &= ~0x00000030;        /* PWM2 output disable */
     }
 
-    if (channel == CKENUM_PWM_CH6 || channel == CKENUM_PWM_CH7) {
+    if (channel == WJENUM_PWM_CH6 || channel == WJENUM_PWM_CH7) {
         addr->PWMCFG &= ~0x000000C0;        /* PWM3 output disable */
     }
 
-    if (channel == CKENUM_PWM_CH8 || channel == CKENUM_PWM_CH9) {
+    if (channel == WJENUM_PWM_CH8 || channel == WJENUM_PWM_CH9) {
         addr->PWMCFG &= ~0x00000300;        /* PWM4 output disable */
     }
 
-    if (channel == CKENUM_PWM_CH10 || channel == CKENUM_PWM_CH11) {
+    if (channel == WJENUM_PWM_CH10 || channel == WJENUM_PWM_CH11) {
         addr->PWMCFG &= ~0x00000C00;        /* PWM5 output disable */
     }
 }
 
-void ck_pwm_irqhandler(int32_t idx)
+void wj_pwm_irqhandler(int32_t idx)
 {
     int i;
 
-    ck_pwm_priv_t *pwm_priv = &pwm_instance[idx];
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = &pwm_instance[idx];
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
     uint32_t capis = addr->CAPIS;
     uint32_t timis = addr->TIMIS;
 
@@ -549,7 +549,7 @@ void drv_pwm_config_cb(pwm_handle_t handle, uint8_t channel, pwm_event_cb_t cb_e
     PWM_NULL_PARAM_CHK_NORETVAL(handle);
 
     void *handler;
-    ck_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_priv_t *pwm_priv = handle;
     pwm_priv->pwm_event_cb[channel] = cb_event;
 
     target_pwm_init(pwm_priv->idx, NULL, NULL, &handler);
@@ -570,8 +570,8 @@ void drv_pwm_capture_config(pwm_handle_t handle, uint8_t channel, pwm_input_conf
 
     uint8_t real_ch = channel / 2;
     uint32_t capctl, capinten;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     capctl = addr->CAPCTL & ~PWM_CAPCTL_EVENT_MODE_Msk(real_ch);
 
@@ -634,8 +634,8 @@ void drv_pwm_capture_start(pwm_handle_t handle, uint8_t channel)
 
     uint8_t real_ch = channel / 2;
     uint32_t pwmcfg;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     pwmcfg = addr->PWMCFG & ~PWM_PWMCFG_OUTPUT_Msk(real_ch);
     addr->PWMCFG = pwmcfg | PWM_PWMCFG_OUTPUT_DISABLE(real_ch);
@@ -655,8 +655,8 @@ void drv_pwm_capture_stop(pwm_handle_t handle, uint8_t channel)
 
     uint8_t real_ch = channel / 2;
     uint32_t pwmcfg, capinten;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     pwmcfg = addr->PWMCFG & ~PWM_PWMCFG_CAPTURE_Msk(real_ch);
     addr->PWMCFG = pwmcfg | PWM_PWMCFG_CAPTURE_DISABLE(real_ch);
@@ -681,8 +681,8 @@ void drv_pwm_timer_set_timeout(pwm_handle_t handle, uint8_t channel, uint32_t ti
     uint32_t clockdiv, sysclk;
     uint32_t pwmcfg;
     uint16_t load;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     clockdiv = drv_pwm_get_clockdiv(handle, channel);
     sysclk = drv_get_pwm_freq(pwm_priv->idx);
@@ -736,8 +736,8 @@ void drv_pwm_timer_start(pwm_handle_t handle, uint8_t channel)
 {
     PWM_NULL_PARAM_CHK_NORETVAL(handle);
 
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     addr->PWMCFG |= (0x1 << (18 + channel));
     addr->TIMINTEN |= 0x1 << channel;
@@ -752,8 +752,8 @@ void drv_pwm_timer_stop(pwm_handle_t handle, uint8_t channel)
 {
     PWM_NULL_PARAM_CHK_NORETVAL(handle);
 
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     addr->PWMCFG &= ~(0x1 << (18 + channel));
     addr->TIMINTEN &= ~(0x1 << channel);
@@ -771,8 +771,8 @@ void drv_pwm_timer_get_current_value(pwm_handle_t handle, uint8_t channel, uint3
     PWM_NULL_PARAM_CHK_NORETVAL(value);
 
     uint16_t cur;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     switch (channel) {
         case 0:
@@ -819,8 +819,8 @@ void drv_pwm_timer_get_load_value(pwm_handle_t handle, uint8_t channel, uint32_t
     PWM_NULL_PARAM_CHK_NORETVAL(value);
 
     uint16_t load;
-    ck_pwm_priv_t *pwm_priv = handle;
-    ck_pwm_reg_t *addr = (ck_pwm_reg_t *)(pwm_priv->base);
+    wj_pwm_priv_t *pwm_priv = handle;
+    wj_pwm_reg_t *addr = (wj_pwm_reg_t *)(pwm_priv->base);
 
     switch (channel) {
         case 0:
