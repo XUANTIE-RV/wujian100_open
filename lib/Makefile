@@ -14,7 +14,8 @@ AS    = ${TOOL_EXTENSION}as
 LINK  = ${TOOL_EXTENSION}ld
 OBJDUMP = ${TOOL_EXTENSION}objdump
 OBJCOPY = ${TOOL_EXTENSION}objcopy
-CONVERT		=../tools/Srec2vmem
+#CONVERT		=../tools/Srec2vmem
+CONVERT		=../tools/Srec2vmem.py
 
 SSRC = $(wildcard *.S)
 sSRC = $(wildcard *.s)
@@ -72,7 +73,8 @@ ${FILE}.hex : ${FILE}.elf
 
 %.pat	: %.hex
 	rm -f *.pat
-	${CONVERT} $< test.pat
+	#${CONVERT} $< test.pat
+	${CONVERT} -i $< -o test.pat
 
 
 #--------------------------------------------------------------------
