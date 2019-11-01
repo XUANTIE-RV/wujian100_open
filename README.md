@@ -31,7 +31,7 @@
     1. cd wujian100_open/tools
     2. vim setup.csh then add the vcs path and license
     3. source setup.csh         //if not success you can touch a new file named setup.csh and copy the content to the new file. then source the new file
-    4. chmod 777 run_case Srec2vmem
+    4. chmod 777 run_case Srec2vmem.py
     5. cd wujian100_open/workdir
     6. if you want to use iverilog as simulation tool please execute the command '../tools/run_case -sim_tool iverilog ../case/timer/timer_test.c' or if you want to use vcs as simulation tool please execute the command '../tools/run_case -sim_tool vcs ../case/timer/timer_test.c'
 # Get ready for FPGA bit generation
