@@ -114,7 +114,7 @@ def hex2vmem(o_argv_info):
             ofile_id.close()
             break
 
-        addr_chars = addr_bits / char_bit_num
+        addr_chars = int(addr_bits / char_bit_num)
 
         line_addr_idx = record_type_chars + line_byte_chars
         line_addr_end = line_addr_idx + addr_chars
@@ -144,7 +144,7 @@ def hex2vmem(o_argv_info):
             
         line_addr = line_addr - base_addr
 
-        cur_mem_addr = line_addr / 4
+        cur_mem_addr = int(line_addr / 4)
         
         if prev_mem_addr == -1:
             prev_mem_addr = cur_mem_addr
