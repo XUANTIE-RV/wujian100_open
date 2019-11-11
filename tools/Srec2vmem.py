@@ -114,14 +114,14 @@ def hex2vmem(o_argv_info):
             ofile_id.close()
             break
 
-        addr_chars = addr_bits / char_bit_num
+        addr_chars = int(addr_bits / char_bit_num)
 
-        line_addr_idx = int(record_type_chars + line_byte_chars)
-        line_addr_end = int(line_addr_idx + addr_chars)
+        line_addr_idx = record_type_chars + line_byte_chars
+        line_addr_end = line_addr_idx + addr_chars
 
         data_chars = (line_bytes * byte_char_num) - addr_chars - check_sum_chars
-        line_data_idx = int(line_addr_end)
-        line_data_end = int(line_data_idx + data_chars)
+        line_data_idx = line_addr_end
+        line_data_end = line_data_idx + data_chars
 
         #print("addr_chars:%d" %addr_chars)
         #print("line_addr_idx:%d" %line_addr_idx)
