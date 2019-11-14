@@ -45,10 +45,6 @@
     9. run tcl use file 'wujian100_open_200t_3b_prj.tcl'
     10. program the bit file to the fpga board
     11. enjoy the application development
-# How to get the FPGA board
-    We will provide 100 FPGA board for evlalution free. Before you apply please simuated the case pass and send the log or screenshot to us. Everyone can apply the FPGA board from pingtouge.
-    apply from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs
-![board.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/b.jpg)
 # How to get the debug tool
     download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs 
 # How to get the IDE for development
