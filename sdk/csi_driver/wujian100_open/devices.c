@@ -201,7 +201,11 @@ int32_t target_gpio_pin_init(int32_t gpio_pin, uint32_t *port_idx)
 {
     *port_idx = 0;
 
-    return 0;
+    if (gpio_pin >= PA0 && gpio_pin <= PA31) {
+        return gpio_pin;
+    }
+
+    return -1;
 }
 
 struct {
