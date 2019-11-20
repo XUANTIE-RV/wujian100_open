@@ -92,7 +92,7 @@ Done
     4. Run the project:
     Click "Debug" on the toolbar,and select "Start/Stop Debugger".
 # Dicussion
-    If you want to discuss about the wujian100_open project. You can scan the QR code below：
+    If you want to discuss about the wujian100_open project. You can scan the DingDing QR code below：
 ![barcode.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/q.jpg) 
 # Reference  and Thanks
     The program model of GPIO refer to the DesignWare of Synopsys 
