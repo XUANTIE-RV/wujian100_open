@@ -8,6 +8,8 @@
 
 # the compiler toolset setting
 
+MAKEDIR = $(shell pwd)
+TOOL_PATH = $(MAKEDIR)/../../riscv_toolchain
 TOOL_EXTENSION	= ${TOOL_PATH}/bin/riscv64-unknown-elf-
 CC    = ${TOOL_EXTENSION}gcc
 AS    = ${TOOL_EXTENSION}as
