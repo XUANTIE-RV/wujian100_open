@@ -14,8 +14,6 @@ AS    = ${TOOL_EXTENSION}as
 LINK  = ${TOOL_EXTENSION}ld
 OBJDUMP = ${TOOL_EXTENSION}objdump
 OBJCOPY = ${TOOL_EXTENSION}objcopy
-#CONVERT		=../tools/Srec2vmem
-CONVERT		=../tools/Srec2vmem.py
 
 SSRC = $(wildcard *.S)
 sSRC = $(wildcard *.s)
@@ -51,6 +49,8 @@ OBJDUMPFLAGS = -S -Mnumeric
 
 HEXFLAGS	= -O srec
 
+PATFLAGS	= -O verilog
+
 %.o : %.c
 	${CC} -c ${CFLAGS} -o $@ $<
 
@@ -61,20 +61,18 @@ HEXFLAGS	= -O srec
 	${CC} -c ${CFLAGS} -o $@ $<
 
 ${FILE}.elf : ${OBJECTS} linker.lcf
-	${CC} ${LINKFLAGS} ${LINKLIBS} ${OBJECTS} -o $@ -lm 
+	${CC} ${LINKFLAGS} ${LINKLIBS} ${OBJECTS} -o $@ -lm
 
 ${FILE}.obj : ${FILE}.elf
 	${OBJDUMP} ${OBJDUMPFLAGS} $< > $@
 
 
 ${FILE}.hex : ${FILE}.elf
-	${OBJCOPY} ${HEXFLAGS} $< $@ 
-
+	${OBJCOPY} ${HEXFLAGS} $< $@
 
 %.pat	: %.hex
 	rm -f *.pat
-	#${CONVERT} $< test.pat
-	${CONVERT} -i $< -o test.pat
+	${OBJCOPY} ${PATFLAGS} $< test.pat
 
 
 #--------------------------------------------------------------------
@@ -84,7 +82,7 @@ all : ${FILE}.pat ${FILE}.hex ${FILE}.elf ${FILE}.obj
 
 #---------------------------------------------------------------------
 # clean some medium code and .pat
-.PHONY :clean 
+.PHONY :clean
 clean:
 	rm -rf *.o *.pat *.elf *.obj *.hex
 
