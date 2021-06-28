@@ -22,7 +22,7 @@
     3. git clone https://github.com/T-head-Semi/wujian100_open.git or git clone git@github.com:T-head-Semi/wujian100_open.git
 # Download C/C++ Compiler
     1. prepare a tool chain install directory named 'riscv_toolchain'  // use the c shell command like 'mkdir riscv_toolchain'
-    2. download the tool chain from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs
+    2. download the tool chain from the url https://occ.t-head.cn/community/download?id=3913221581316624384
     3. install the tool chain to the riscv_toolchain dirctory
 # Get open source EDA tools
     centos7/rhel7:  sudo yum install iverilog verilator gtkwave
@@ -46,9 +46,9 @@
     10. program the bit file to the fpga board
     11. enjoy the application development
 # How to get the debug tool
-    download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs 
+    download from the url https://occ.t-head.cn/community/download?id=616215132330000384 
 # How to get the IDE for development
-    download from the url https://www.t-head.cn/product/mcu-platform?spm=a2ouz.12987052.0.0.167548abiiSAQs  
+    download from the url https://occ.t-head.cn/community/download?id=575997419775328256  
 # How to use the sdk
 wujian100_open SDK is wujian100_open software development kit, the software follows the CSI interface specification. Through the SDK users can quickly wujian100_open test and evaluation. At the same time users can refer to the SDK integration of various commonly used components and sample procedures for application development quickly form a product solution.
 ```
