@@ -93,7 +93,7 @@ Done
     Click "Debug" on the toolbar,and select "Start/Stop Debugger".
 # Dicussion
     If you want to discuss about the wujian100_open project. You can scan the DingDing QR code below：
-![barcode.jpg](https://cop-image-prod.oss-cn-hangzhou.aliyuncs.com/mcu/q.jpg) 
+![barcode.jpg](https://github.com/T-head-Semi/wujian100_open/blob/master/doc/QR_Code_Wujian100.JPG) 
 # Reference  and Thanks
     The program model of GPIO refer to the DesignWare of Synopsys 
     The program model of Timer refer to the DesignWare of Synopsys 
