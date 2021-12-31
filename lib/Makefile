@@ -28,10 +28,10 @@ DEFSYM = $(shell echo ${CPU} | sed 's/\(e9[0-9]\{2\}\).*/\1/')
 CPU_M = $(shell echo ${CPU} | sed '/m/p')
 
 ifeq ($(findstring e902m, ${CPU_M}), e902m)
-	CFLAGS = -march=rv32emcxcki -mabi=ilp32e
+	CFLAGS = -march=rv32emc -mabi=ilp32e
 	LDFLAGS = -march=rv32emc -mabi=ilp32e
 else
-	CFLAGS = -march=rv32ecxcki -mabi=ilp32e
+	CFLAGS = -march=rv32ec -mabi=ilp32e
 	LDFLAGS = -march=rv32ec -mabi=ilp32e
 endif
 
