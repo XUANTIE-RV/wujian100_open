@@ -99,3 +99,9 @@ Done
     The program model of GPIO refer to the DesignWare of Synopsys 
     The program model of Timer refer to the DesignWare of Synopsys 
     The program model of WDT refer to the DesignWare of Synopsys 
+
+## Community & Resources
+
+For additional documentation and resources related to RISC-V SoC development, refer to the following:
+
+* [XuanTie Open Community](https://www.xrvm.cn/community)
